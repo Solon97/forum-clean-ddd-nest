@@ -1,5 +1,7 @@
+import { Env } from '@/env';
 import { PrismaClient } from './generated/client';
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 @Injectable()
@@ -7,10 +9,10 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-  constructor() {
+  constructor(private configService: ConfigService<Env, true>) {
     super({
       adapter: new PrismaPg({
-        connectionString: process.env.DATABASE_URL!,
+        connectionString: configService.get('DATABASE_URL', { infer: true }),
       }),
     });
   }
