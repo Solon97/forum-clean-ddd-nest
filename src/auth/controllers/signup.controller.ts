@@ -18,7 +18,7 @@ const signupBodySchema = z.object({
 
 type SignupBody = z.infer<typeof signupBodySchema>;
 
-@Controller('signup')
+@Controller('auth/signup')
 export class SignupController {
   constructor(private readonly prismaService: PrismaService) {}
   @Post()
