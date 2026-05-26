@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
-import { SignupController } from './controllers/signup.controller';
-import { PrismaModule } from '@/prisma/prisma.module';
-import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
 import { EnvConfigService } from '@/env/env.service';
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 import { SigninController } from './controllers/signin.controller';
+import { SignupController } from './controllers/signup.controller';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
@@ -23,8 +23,8 @@ import { SigninController } from './controllers/signin.controller';
         };
       },
     }),
-    PrismaModule,
   ],
   controllers: [SignupController, SigninController],
+  providers: [JwtStrategy],
 })
 export class AuthModule {}
