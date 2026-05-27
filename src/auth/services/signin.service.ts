@@ -1,9 +1,8 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { compareHashValue } from '@/shared/hash';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { compare } from 'bcryptjs';
 import { z } from 'zod';
-import { GenerateTokensService } from './generate-tokens.service';
+import { TokenService } from './tokens.service';
 
 export const signinBodySchema = z.object({
   email: z.email(),
@@ -15,9 +14,8 @@ export type SigninBody = z.infer<typeof signinBodySchema>;
 @Injectable()
 export class SigninService {
   constructor(
-    private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
-    private readonly generateTokensService: GenerateTokensService,
+    private readonly tokenService: TokenService,
   ) {}
 
   async execute(body: SigninBody) {
@@ -32,14 +30,11 @@ export class SigninService {
       throw new UnauthorizedException('User credentials are invalid');
     }
 
-    const isPasswordValid = await compareHashValue(
-      password,
-      existingUser.password,
-    );
+    const isPasswordValid = await compare(password, existingUser.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('User credentials are invalid');
     }
 
-    return this.generateTokensService.execute(existingUser.id);
+    return this.tokenService.generateTokens(existingUser.id);
   }
 }

@@ -1,9 +1,6 @@
 import { ZodValidationPipe } from '@/pipes/zod-validation-pipe';
-import { UserModel } from '@/prisma/generated/models';
 import { Body, Controller, Post, UseGuards, UsePipes } from '@nestjs/common';
-import { CurrentUser } from './current-user-decorator';
-import { RefreshJwtAuthGuard } from './refresh-auth.guard';
-import { RefreshTokenService } from './services/refresh.service';
+import { RefreshTokenGuard } from './refresh-auth.guard';
 import {
   SigninBody,
   signinBodySchema,
@@ -14,13 +11,18 @@ import {
   signupBodySchema,
   SignupService,
 } from './services/signup.service';
+import { TokenService } from './services/tokens.service';
+import { RequestRefreshToken } from './tokens-decorator';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { CurrentUser } from './current-user-decorator';
+import { UserModel } from '@/prisma/generated/models';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly signupService: SignupService,
     private readonly signinService: SigninService,
-    private readonly refreshTokenService: RefreshTokenService,
+    private readonly tokenService: TokenService,
   ) {}
 
   @Post('signup')
@@ -36,8 +38,14 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @UseGuards(RefreshJwtAuthGuard)
-  async refresh(@CurrentUser() user: UserModel) {
-    return this.refreshTokenService.execute(user.id);
+  @UseGuards(RefreshTokenGuard)
+  async refresh(@RequestRefreshToken() refreshToken: string) {
+    return this.tokenService.refreshTokens(refreshToken);
+  }
+
+  @Post('signout')
+  @UseGuards(JwtAuthGuard)
+  async signout(@CurrentUser() user: UserModel) {
+    return this.tokenService.revokeUserTokens(user.id);
   }
 }

@@ -1,6 +1,6 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { hashValue } from '@/shared/hash';
 import { ConflictException, Injectable } from '@nestjs/common';
+import { genSalt, hash } from 'bcryptjs';
 import z from 'zod';
 
 export const signupBodySchema = z.object({
@@ -26,7 +26,9 @@ export class SignupService {
       throw new ConflictException('User already exists');
     }
 
-    const hashedPassword = await hashValue(password);
+    const salt = await genSalt(10);
+    const hashedPassword = await hash(password, salt);
+
     const user = await this.prismaService.user.create({
       data: {
         name,
