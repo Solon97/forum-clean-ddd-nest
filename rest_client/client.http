@@ -1,13 +1,14 @@
 @baseUrl = http://localhost:3000
 
 @authToken = {{signin.response.body.access_token}}
+@refreshToken = {{signin.response.body.refresh_token}}
 
 POST {{baseUrl}}/auth/signup
 Content-Type: application/json
 
 {
   "name": "John Doe",
-  "email": "john.doe1@example.com",
+  "email": "john.doe3@example.com",
   "password": "12345678"
 }
 
@@ -19,8 +20,19 @@ POST {{baseUrl}}/auth/signin
 Content-Type: application/json
 
 {
-  "email": "john.doe1@example.com",
+  "email": "john.doe3@example.com",
   "password": "12345678"
+}
+
+###
+
+# @name refresh
+
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "token": "{{refreshToken}}"
 }
 
 ###

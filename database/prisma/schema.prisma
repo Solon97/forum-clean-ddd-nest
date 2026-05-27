@@ -5,7 +5,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../src/prisma/generated"
+  output   = "../../src/prisma/generated"
 }
 
 datasource db {
@@ -13,11 +13,12 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  name      String
-  email     String     @unique
-  password  String
-  questions Question[]
+  id           String     @id @default(uuid())
+  name         String
+  email        String     @unique
+  password     String
+  refreshToken String?    @map("refresh_token")
+  questions    Question[]
 
   @@map("users")
 }

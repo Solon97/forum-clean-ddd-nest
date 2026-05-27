@@ -1,12 +1,17 @@
 import { EnvConfigService } from '@/env/env.service';
 import { PrismaService } from '@/prisma/prisma.service';
+import { compareHashValue } from '@/shared/hash';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
+import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { TokenPayload, tokenSchema } from './token-schema';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class RefreshJwtTokenStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh',
+) {
   constructor(
     private readonly configService: EnvConfigService,
     private readonly prismaService: PrismaService,
@@ -14,15 +19,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const publicKey = configService.get('JWT_PUBLIC_KEY');
 
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromBodyField('token'),
       secretOrKey: Buffer.from(publicKey, 'base64'),
       algorithms: ['RS256'],
+      passReqToCallback: true,
     });
   }
 
-  async validate(payload: TokenPayload) {
+  async validate(req: Request, payload: TokenPayload) {
     const result = tokenSchema.safeParse(payload);
-    if (!result.success || payload.type !== 'access_token') {
+    if (!result.success || payload.type !== 'refresh_token') {
       throw new UnauthorizedException('Invalid token');
     }
 
@@ -30,7 +36,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       where: { id: payload.sub },
     });
 
-    if (!user) {
+    if (!user || !user.refreshToken) {
+      throw new UnauthorizedException('Invalid token');
+    }
+    console.log('User found for refresh token:', user.id);
+    console.log('User refresh token hash:', user.refreshToken);
+    const rawToken = (req.body as { token: string }).token;
+    console.log('Raw token from request:', rawToken);
+    const tokenMatches = await compareHashValue(rawToken, user.refreshToken);
+    console.log('Does the provided token match the stored hash?', tokenMatches);
+    if (!tokenMatches) {
       throw new UnauthorizedException('Invalid token');
     }
 

@@ -2,9 +2,13 @@ import { EnvConfigService } from '@/env/env.service';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { SigninController } from './controllers/signin.controller';
-import { SignupController } from './controllers/signup.controller';
+import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
+import { SigninService } from './services/signin.service';
+import { SignupService } from './services/signup.service';
+import { GenerateTokensService } from './services/generate-tokens.service';
+import { RefreshTokenService } from './services/refresh.service';
+import { RefreshJwtTokenStrategy } from './refresh.strategy';
 
 @Module({
   imports: [
@@ -19,12 +23,19 @@ import { JwtStrategy } from './jwt.strategy';
         return {
           privateKey: Buffer.from(privateKey, 'base64'),
           publicKey: Buffer.from(publicKey, 'base64'),
-          signOptions: { algorithm: 'RS256' },
+          signOptions: { algorithm: 'RS256', expiresIn: '15m' },
         };
       },
     }),
   ],
-  controllers: [SignupController, SigninController],
-  providers: [JwtStrategy],
+  controllers: [AuthController],
+  providers: [
+    JwtStrategy,
+    SigninService,
+    SignupService,
+    GenerateTokensService,
+    RefreshJwtTokenStrategy,
+    RefreshTokenService,
+  ],
 })
 export class AuthModule {}
