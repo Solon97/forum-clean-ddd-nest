@@ -1,4 +1,4 @@
-import { PrismaService } from '@/prisma/prisma.service';
+import { PrismaService } from '@/infra/database/prisma/prisma.service';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { genSalt, hash } from 'bcryptjs';
 import z from 'zod';

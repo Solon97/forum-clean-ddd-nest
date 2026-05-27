@@ -1,5 +1,5 @@
-import { EnvConfigService } from '@/env/env.service';
-import { PrismaService } from '@/prisma/prisma.service';
+import { EnvConfigService } from '@/infra/env/env.service';
+import { PrismaService } from '@/infra/database/prisma/prisma.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';

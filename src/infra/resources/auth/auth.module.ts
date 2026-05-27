@@ -1,4 +1,4 @@
-import { EnvConfigService } from '@/env/env.service';
+import { EnvConfigService } from '@/infra/env/env.service';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';

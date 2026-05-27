@@ -1,4 +1,4 @@
-import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '@/infra/auth/jwt-auth.guard';
 import { Controller, Post, UseGuards } from '@nestjs/common';
 
 @Controller('questions')

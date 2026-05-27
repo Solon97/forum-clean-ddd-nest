@@ -1,4 +1,4 @@
-import { EnvConfigService } from '@/env/env.service';
+import { EnvConfigService } from '@/infra/env/env.service';
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from './generated/client';

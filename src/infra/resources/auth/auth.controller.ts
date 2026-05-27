@@ -1,4 +1,4 @@
-import { ZodValidationPipe } from '@/pipes/zod-validation-pipe';
+import { ZodValidationPipe } from '@/infra/pipes/zod-validation-pipe';
 import { Body, Controller, Post, UseGuards, UsePipes } from '@nestjs/common';
 import { RefreshTokenGuard } from './refresh-auth.guard';
 import {
@@ -15,7 +15,7 @@ import { TokenService } from './services/tokens.service';
 import { RequestRefreshToken } from './tokens-decorator';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { CurrentUser } from './current-user-decorator';
-import { UserModel } from '@/prisma/generated/models';
+import { UserModel } from '@/infra/database/prisma/generated/models';
 
 @Controller('auth')
 export class AuthController {
