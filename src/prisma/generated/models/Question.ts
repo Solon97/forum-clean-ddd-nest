@@ -403,10 +403,6 @@ export type QuestionUncheckedUpdateManyWithoutAuthorNestedInput = {
   deleteMany?: Prisma.QuestionScalarWhereInput | Prisma.QuestionScalarWhereInput[]
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
 export type QuestionCreateWithoutAuthorInput = {
   id?: string
   title: string
