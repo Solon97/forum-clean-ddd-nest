@@ -29,6 +29,6 @@ export class CreateQuestionService {
       throw new InternalServerErrorException('Failed to create question');
     }
 
-    return result.right;
+    return { id: result.right.question.id.toString() };
   }
 }
