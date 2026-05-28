@@ -15,12 +15,14 @@ export interface QuestionProps {
   slug: Slug;
 }
 
+export type QuestionConstructorProps = Optional<
+  QuestionProps,
+  'slug' | 'attachments'
+> &
+  Partial<Timestamps>;
+
 export class Question extends AggregateRoot<QuestionProps & Timestamps> {
-  constructor(
-    props: Optional<QuestionProps, 'slug' | 'attachments'> &
-      Partial<Timestamps>,
-    id?: UniqueEntityId,
-  ) {
+  constructor(props: QuestionConstructorProps, id?: UniqueEntityId) {
     const slug = props.slug || Slug.createFromText(props.title);
     const propsWithTimestamps = BaseEntity.setPropsTimestamps({
       ...props,

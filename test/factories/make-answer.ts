@@ -8,8 +8,8 @@ export function makeAnswer(
   const answer: Answer = new Answer(
     {
       content: 'This is an example answer.',
-      authorId: new UniqueEntityId(),
-      questionId: new UniqueEntityId(),
+      authorId: UniqueEntityId.create(),
+      questionId: UniqueEntityId.create(),
       ...override,
     },
     id,

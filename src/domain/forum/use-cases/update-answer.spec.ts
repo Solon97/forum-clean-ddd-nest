@@ -64,15 +64,15 @@ describe('Update Answer', () => {
     await inMemoryAnswerRepository.create(exampleAnswer);
     const existingAttachment = new AnswerAttachment({
       answerId: exampleAnswer.id,
-      attachmentId: new UniqueEntityId(),
+      attachmentId: UniqueEntityId.create(),
     });
     const removedAttachment = new AnswerAttachment({
       answerId: exampleAnswer.id,
-      attachmentId: new UniqueEntityId(),
+      attachmentId: UniqueEntityId.create(),
     });
     const newAttachment = new AnswerAttachment({
       answerId: exampleAnswer.id,
-      attachmentId: new UniqueEntityId(),
+      attachmentId: UniqueEntityId.create(),
     });
 
     inMemoryAnswerAttachmentsRepository.items.push(

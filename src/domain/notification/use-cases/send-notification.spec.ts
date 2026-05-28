@@ -22,7 +22,7 @@ describe('Send Notification', () => {
 
   it('should send a notification', async () => {
     const input: SendNotificationUseCaseInput = {
-      recipientId: new UniqueEntityId().toString(),
+      recipientId: UniqueEntityId.create().toString(),
       title: 'A new answer was posted on your question',
       content: 'A student answered your question about DDD aggregates.',
     };

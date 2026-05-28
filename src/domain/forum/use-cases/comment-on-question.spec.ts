@@ -38,7 +38,7 @@ describe('Comment On Question', () => {
     const input: CommentOnQuestionUseCaseInput = {
       content: 'This is a comment',
       questionId: exampleQuestion.id.toString(),
-      authorId: new UniqueEntityId().toString(),
+      authorId: UniqueEntityId.create().toString(),
     };
 
     const result = await sut.execute(input);
@@ -56,8 +56,8 @@ describe('Comment On Question', () => {
   it('should not be able to comment on a non existing question', async () => {
     const result = await sut.execute({
       content: 'This is a comment',
-      questionId: 'non-existing-question-id',
-      authorId: 'any-author-id',
+      questionId: UniqueEntityId.create().toString(),
+      authorId: UniqueEntityId.create().toString(),
     });
     assertEitherIsLeft(result);
     expect(result.left).toBeInstanceOf(ResourceNotFoundError);

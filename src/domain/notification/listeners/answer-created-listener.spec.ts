@@ -44,7 +44,7 @@ describe('AnswerCreatedListener', () => {
     const result = await answerQuestionUseCase.execute({
       questionId: question.id.toString(),
       content: 'You can use Jest for testing event listeners.',
-      authorId: new UniqueEntityId().toString(),
+      authorId: UniqueEntityId.create().toString(),
       attachmentIds: [],
     });
 

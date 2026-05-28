@@ -10,7 +10,7 @@ export function makeQuestion(
     {
       title: 'Example Question',
       content: 'This is an example question.',
-      authorId: new UniqueEntityId(),
+      authorId: UniqueEntityId.create(),
       ...override,
     },
     id,

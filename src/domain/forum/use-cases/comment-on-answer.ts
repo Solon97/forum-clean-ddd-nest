@@ -1,9 +1,12 @@
-import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id';
+import {
+  InvalidUniqueEntityIdError,
+  UniqueEntityId,
+} from '@/shared/entities/value-objects/unique-entity-id';
 import { AnswerComment } from '../entities/comment';
 import { AnswerCommentRepository } from '../repositories/answer-comment-repository';
 import { AnswerRepository } from '../repositories/answer-repository';
 import { ResourceNotFoundError } from '../../../shared/errors/resource-not-found';
-import { Either, left, right } from 'fp-ts/lib/Either';
+import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 
 export interface CommentOnAnswerUseCaseInput {
   authorId: string;
@@ -26,22 +29,34 @@ export class CommentOnAnswerUseCase {
     answerId,
     content,
   }: CommentOnAnswerUseCaseInput): Promise<
-    Either<ResourceNotFoundError, CommentOnAnswerUseCaseOutput>
+    Either<
+      ResourceNotFoundError | InvalidUniqueEntityIdError,
+      CommentOnAnswerUseCaseOutput
+    >
   > {
+    const authorIdOrError = UniqueEntityId.createFromExistingId(authorId);
+    if (isLeft(authorIdOrError)) {
+      return left(new InvalidUniqueEntityIdError('Author'));
+    }
+
+    const answerIdOrError = UniqueEntityId.createFromExistingId(answerId);
+    if (isLeft(answerIdOrError)) {
+      return left(new InvalidUniqueEntityIdError('Answer'));
+    }
+
     const answer = await this.answerRepository.findById(answerId);
     if (!answer) {
       return left(new ResourceNotFoundError());
     }
+
     const comment = new AnswerComment({
-      authorId: new UniqueEntityId(authorId),
-      answerId: new UniqueEntityId(answerId),
+      authorId: authorIdOrError.right,
+      answerId: answerIdOrError.right,
       content,
     });
 
     await this.answerCommentRepository.create(comment);
 
-    return right({
-      comment,
-    });
+    return right({ comment });
   }
 }

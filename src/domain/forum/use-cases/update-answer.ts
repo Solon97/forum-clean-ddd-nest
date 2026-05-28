@@ -1,10 +1,13 @@
-import { Either, left, right } from 'fp-ts/lib/Either';
+import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { AnswerRepository } from '../repositories/answer-repository';
 import { ResourceNotFoundError } from '../../../shared/errors/resource-not-found';
 import { AnswerAttachmentsRepository } from '../repositories/answer-attachments-repository';
 import { AnswerAttachmentList } from '../entities/answer-attachment-list';
 import { AnswerAttachment } from '../entities/answer-attachment';
-import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id';
+import {
+  InvalidUniqueEntityIdError,
+  UniqueEntityId,
+} from '@/shared/entities/value-objects/unique-entity-id';
 import { Answer } from '../entities/answer';
 
 export interface UpdateAnswerUseCaseInput {
@@ -30,7 +33,10 @@ export class UpdateAnswerUseCase {
     content,
     attachmentIds,
   }: UpdateAnswerUseCaseInput): Promise<
-    Either<ResourceNotFoundError, UpdateAnswerUseCaseOutput>
+    Either<
+      ResourceNotFoundError | InvalidUniqueEntityIdError,
+      UpdateAnswerUseCaseOutput
+    >
   > {
     const answer = await this.answerRepository.findById(answerId);
     if (!answer || answer.authorId.toString() !== authorId) {
@@ -41,12 +47,19 @@ export class UpdateAnswerUseCase {
       await this.answerAttachmentsRepository.findManyByAnswerId(answerId);
     const answerAttachmentList = new AnswerAttachmentList(existingAttachments);
 
-    const newAnswerAttachments = attachmentIds.map((attachmentId) => {
-      return new AnswerAttachment({
-        answerId: answer.id,
-        attachmentId: new UniqueEntityId(attachmentId),
-      });
-    });
+    const newAnswerAttachments: AnswerAttachment[] = [];
+    for (const attachmentId of attachmentIds) {
+      const attachmentIdOrError = UniqueEntityId.createFromExistingId(attachmentId);
+      if (isLeft(attachmentIdOrError)) {
+        return left(new InvalidUniqueEntityIdError('Attachment'));
+      }
+      newAnswerAttachments.push(
+        new AnswerAttachment({
+          answerId: answer.id,
+          attachmentId: attachmentIdOrError.right,
+        }),
+      );
+    }
 
     answerAttachmentList.update(newAnswerAttachments);
     answer.attachments = answerAttachmentList;

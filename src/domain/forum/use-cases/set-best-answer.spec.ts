@@ -13,6 +13,7 @@ import { SetBestAnswerUseCase } from './set-best-answer';
 import { makeQuestion } from '@test/factories/make-question';
 import { NotAllowedError } from '../../../shared/errors/not-allowed';
 import { ResourceNotFoundError } from '../../../shared/errors/resource-not-found';
+import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id';
 
 let inMemoryQuestionRepository: QuestionRepository;
 let inMemoryAnswerRepository: AnswerRepository;
@@ -65,8 +66,8 @@ describe('Set Best Answer', () => {
 
   it('should not be able to set the best answer for a non existing answer', async () => {
     const result = await sut.execute({
-      answerId: 'non-existing-answer-id',
-      authorId: 'any-author-id',
+      answerId: UniqueEntityId.create().toString(),
+      authorId: UniqueEntityId.create().toString(),
     });
     assertEitherIsLeft(result);
     expect(result.left).toBeInstanceOf(ResourceNotFoundError);
@@ -78,7 +79,7 @@ describe('Set Best Answer', () => {
     await inMemoryAnswerRepository.create(exampleAnswer);
     const result = await sut.execute({
       answerId: exampleAnswer.id.toString(),
-      authorId: 'any-author-id',
+      authorId: UniqueEntityId.create().toString(),
     });
     assertEitherIsLeft(result);
     expect(result.left).toBeInstanceOf(ResourceNotFoundError);
@@ -92,7 +93,7 @@ describe('Set Best Answer', () => {
     await inMemoryAnswerRepository.create(exampleAnswer);
     const result = await sut.execute({
       answerId: exampleAnswer.id.toString(),
-      authorId: 'other-author-id',
+      authorId: UniqueEntityId.create().toString(),
     });
     assertEitherIsLeft(result);
     expect(result.left).toBeInstanceOf(NotAllowedError);

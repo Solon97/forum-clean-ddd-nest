@@ -21,8 +21,8 @@ describe('Create Answer', () => {
   });
 
   test('should be able to create an answer', async () => {
-    const questionId = new UniqueEntityId().toString();
-    const authorId = new UniqueEntityId().toString();
+    const questionId = UniqueEntityId.create().toString();
+    const authorId = UniqueEntityId.create().toString();
     const input: AnswerQuestionUseCaseInput = {
       questionId,
       authorId,
@@ -43,15 +43,15 @@ describe('Create Answer', () => {
   });
 
   test('should be able to create an answer with attachments', async () => {
-    const questionId = new UniqueEntityId().toString();
-    const authorId = new UniqueEntityId().toString();
+    const questionId = UniqueEntityId.create().toString();
+    const authorId = UniqueEntityId.create().toString();
     const input: AnswerQuestionUseCaseInput = {
       questionId,
       authorId,
       content: 'This is an answer to the question.',
       attachmentIds: [
-        new UniqueEntityId().toString(),
-        new UniqueEntityId().toString(),
+        UniqueEntityId.create().toString(),
+        UniqueEntityId.create().toString(),
       ],
     };
 

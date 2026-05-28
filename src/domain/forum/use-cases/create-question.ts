@@ -1,9 +1,12 @@
 import { Question } from '../entities/question';
-import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id';
+import {
+  InvalidUniqueEntityIdError,
+  UniqueEntityId,
+} from '@/shared/entities/value-objects/unique-entity-id';
 import { QuestionRepository } from '../repositories/question-repository';
 import { QuestionAttachment } from '../entities/question-attachment';
 import { QuestionAttachmentList } from '../entities/question-attachment-list';
-import { Either, right } from 'fp-ts/lib/Either';
+import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 
 export interface CreateQuestionUseCaseInput {
   authorId: string;
@@ -13,7 +16,7 @@ export interface CreateQuestionUseCaseInput {
 }
 
 export interface CreateQuestionUseCaseOutput {
-  id: string;
+  question: Question;
 }
 
 export class CreateQuestionUseCase {
@@ -25,27 +28,38 @@ export class CreateQuestionUseCase {
     content,
     attachmentIds,
   }: CreateQuestionUseCaseInput): Promise<
-    Either<never, CreateQuestionUseCaseOutput>
+    Either<InvalidUniqueEntityIdError, CreateQuestionUseCaseOutput>
   > {
+    const authorIdOrError = UniqueEntityId.createFromExistingId(authorId);
+    if (isLeft(authorIdOrError)) {
+      return left(new InvalidUniqueEntityIdError('Author'));
+    }
+
     const question = new Question({
-      authorId: new UniqueEntityId(authorId),
+      authorId: authorIdOrError.right,
       title,
       content,
     });
 
-    const questionAttachments = attachmentIds.map((attachmentId) => {
-      return new QuestionAttachment({
-        questionId: question.id,
-        attachmentId: new UniqueEntityId(attachmentId),
-      });
-    });
+    const questionAttachments: QuestionAttachment[] = [];
+    for (const attachmentId of attachmentIds) {
+      const attachmentIdOrError =
+        UniqueEntityId.createFromExistingId(attachmentId);
+      if (isLeft(attachmentIdOrError)) {
+        return left(new InvalidUniqueEntityIdError('Attachment'));
+      }
+      questionAttachments.push(
+        new QuestionAttachment({
+          questionId: question.id,
+          attachmentId: attachmentIdOrError.right,
+        }),
+      );
+    }
 
     question.attachments = new QuestionAttachmentList(questionAttachments);
 
     await this.questionRepository.create(question);
 
-    return right({
-      id: question.id.toString(),
-    });
+    return right({ question });
   }
 }

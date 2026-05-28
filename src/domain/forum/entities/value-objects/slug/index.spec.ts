@@ -1,3 +1,4 @@
+import { isLeft, isRight } from 'fp-ts/lib/Either';
 import { Slug } from './index';
 
 test('should be able to create a slug from a text', () => {
@@ -26,12 +27,14 @@ test('should be able to create a slug from a text with leading and trailing hyph
 });
 
 test('should be able to create a slug from an existing slug', () => {
-  const slug = Slug.createFromExistingSlug('hello-world');
-  expect(slug.value).toBe('hello-world');
+  const result = Slug.createFromExistingSlug('hello-world');
+  expect(isRight(result)).toBe(true);
+  if (isRight(result)) {
+    expect(result.right.value).toBe('hello-world');
+  }
 });
 
-test('should throw an error when trying to create a slug from an invalid existing slug', () => {
-  expect(() => {
-    Slug.createFromExistingSlug('Invalid Slug!');
-  }).toThrow('Invalid slug');
+test('should return Left when trying to create a slug from an invalid existing slug', () => {
+  const result = Slug.createFromExistingSlug('Invalid Slug!');
+  expect(isLeft(result)).toBe(true);
 });

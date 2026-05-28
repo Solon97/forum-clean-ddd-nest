@@ -1,7 +1,10 @@
-import { Either, left, right } from 'fp-ts/lib/Either';
+import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { QuestionRepository } from '../repositories/question-repository';
 import { ResourceNotFoundError } from '../../../shared/errors/resource-not-found';
-import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id';
+import {
+  InvalidUniqueEntityIdError,
+  UniqueEntityId,
+} from '@/shared/entities/value-objects/unique-entity-id';
 import { QuestionAttachment } from '../entities/question-attachment';
 import { QuestionAttachmentList } from '../entities/question-attachment-list';
 import { QuestionAttachmentsRepository } from '../repositories/question-attachments-repository';
@@ -32,7 +35,10 @@ export class UpdateQuestionUseCase {
     content,
     attachmentIds,
   }: UpdateQuestionUseCaseInput): Promise<
-    Either<ResourceNotFoundError, UpdateQuestionUseCaseOutput>
+    Either<
+      ResourceNotFoundError | InvalidUniqueEntityIdError,
+      UpdateQuestionUseCaseOutput
+    >
   > {
     const question = await this.questionRepository.findById(questionId);
     if (!question || question.authorId.toString() !== authorId) {
@@ -45,12 +51,19 @@ export class UpdateQuestionUseCase {
       existingAttachments,
     );
 
-    const newQuestionAttachments = attachmentIds.map((attachmentId) => {
-      return new QuestionAttachment({
-        questionId: question.id,
-        attachmentId: new UniqueEntityId(attachmentId),
-      });
-    });
+    const newQuestionAttachments: QuestionAttachment[] = [];
+    for (const attachmentId of attachmentIds) {
+      const attachmentIdOrError = UniqueEntityId.createFromExistingId(attachmentId);
+      if (isLeft(attachmentIdOrError)) {
+        return left(new InvalidUniqueEntityIdError('Attachment'));
+      }
+      newQuestionAttachments.push(
+        new QuestionAttachment({
+          questionId: question.id,
+          attachmentId: attachmentIdOrError.right,
+        }),
+      );
+    }
 
     questionAttachmentList.update(newQuestionAttachments);
     question.attachments = questionAttachmentList;

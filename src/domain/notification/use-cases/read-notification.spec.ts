@@ -27,7 +27,7 @@ describe('Read Notification', () => {
     const now = new Date('2026-01-01T00:00:00.000Z');
     vi.setSystemTime(now);
 
-    const recipientId = new UniqueEntityId().toString();
+    const recipientId = UniqueEntityId.create().toString();
     const notification = new Notification({
       recipientId,
       title: 'A new answer was posted on your question',
@@ -70,7 +70,7 @@ describe('Read Notification', () => {
 
   it('should not be able to read a notification from another recipient', async () => {
     const notification = new Notification({
-      recipientId: new UniqueEntityId().toString(),
+      recipientId: UniqueEntityId.create().toString(),
       title: 'A new answer was posted on your question',
       content: 'A student answered your question about DDD aggregates.',
     });

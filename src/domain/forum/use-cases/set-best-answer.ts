@@ -1,6 +1,9 @@
-import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id/index';
+import {
+  InvalidUniqueEntityIdError,
+  UniqueEntityId,
+} from '@/shared/entities/value-objects/unique-entity-id/index';
 import { DomainEvents } from '@/shared/events/domain-events';
-import { Either, left, right } from 'fp-ts/lib/Either';
+import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { NotAllowedError } from '../../../shared/errors/not-allowed';
 import { ResourceNotFoundError } from '../../../shared/errors/resource-not-found';
 import type { AnswerRepository } from '../repositories/answer-repository';
@@ -21,8 +24,16 @@ export class SetBestAnswerUseCase {
     answerId,
     authorId,
   }: SetBestAnswerUseCaseInput): Promise<
-    Either<ResourceNotFoundError | NotAllowedError, undefined>
+    Either<
+      ResourceNotFoundError | NotAllowedError | InvalidUniqueEntityIdError,
+      undefined
+    >
   > {
+    const answerIdOrError = UniqueEntityId.createFromExistingId(answerId);
+    if (isLeft(answerIdOrError)) {
+      return left(new InvalidUniqueEntityIdError('Answer'));
+    }
+
     const answer = await this.answerRepository.findById(answerId);
     if (!answer) {
       return left(new ResourceNotFoundError());
@@ -36,7 +47,7 @@ export class SetBestAnswerUseCase {
     if (question.authorId.toString() !== authorId) {
       return left(new NotAllowedError());
     }
-    question.bestAnswerId = new UniqueEntityId(answerId);
+    question.bestAnswerId = answerIdOrError.right;
     await this.questionRepository.update(question);
     await DomainEvents.dispatchEventsForAggregate(question.id);
     return right(undefined);

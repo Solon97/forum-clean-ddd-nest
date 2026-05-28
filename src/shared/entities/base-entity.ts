@@ -10,7 +10,7 @@ export class BaseEntity<TProps extends object> {
   protected props: TProps;
 
   constructor(props: TProps, id?: UniqueEntityId) {
-    this.id = id ?? new UniqueEntityId();
+    this.id = id ?? UniqueEntityId.create();
     this.props = props;
   }
 

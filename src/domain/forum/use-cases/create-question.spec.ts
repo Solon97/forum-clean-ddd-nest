@@ -22,7 +22,7 @@ describe('Create Question', () => {
 
   it('should create a question', async () => {
     const input: CreateQuestionUseCaseInput = {
-      authorId: new UniqueEntityId().toString(),
+      authorId: UniqueEntityId.create().toString(),
       title: 'How to implement DDD in a forum application?',
       content:
         'I want to learn how to implement DDD in a forum application. Any tips?',
@@ -45,11 +45,11 @@ describe('Create Question', () => {
 
   it('should create a question with attachments', async () => {
     const input: CreateQuestionUseCaseInput = {
-      authorId: new UniqueEntityId().toString(),
+      authorId: UniqueEntityId.create().toString(),
       title: 'How to implement DDD in a forum application?',
       content:
         'I want to learn how to implement DDD in a forum application. Any tips?',
-      attachmentIds: [new UniqueEntityId().toString()],
+      attachmentIds: [UniqueEntityId.create().toString()],
     };
 
     const result = await sut.execute(input);

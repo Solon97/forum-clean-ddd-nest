@@ -25,8 +25,8 @@ describe('Delete Question Comment', () => {
   it('should be able to delete a question comment', async () => {
     const exampleComment = new QuestionComment({
       content: 'This is a question comment',
-      authorId: new UniqueEntityId(),
-      questionId: new UniqueEntityId(),
+      authorId: UniqueEntityId.create(),
+      questionId: UniqueEntityId.create(),
     });
 
     await inMemoryQuestionCommentRepository.create(exampleComment);
@@ -60,8 +60,8 @@ describe('Delete Question Comment', () => {
   it('should not be able to delete a question comment from another author', async () => {
     const exampleComment = new QuestionComment({
       content: 'This is a question comment',
-      authorId: new UniqueEntityId(),
-      questionId: new UniqueEntityId(),
+      authorId: UniqueEntityId.create(),
+      questionId: UniqueEntityId.create(),
     });
 
     await inMemoryQuestionCommentRepository.create(exampleComment);

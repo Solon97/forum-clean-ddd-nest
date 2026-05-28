@@ -1,3 +1,12 @@
+import { Either, left, right } from 'fp-ts/lib/Either';
+
+export class InvalidSlugError extends Error {
+  constructor() {
+    super('Invalid slug');
+    this.name = 'InvalidSlugError';
+  }
+}
+
 export class Slug {
   private constructor(readonly value: string) {}
 
@@ -5,9 +14,9 @@ export class Slug {
     return new Slug(Slug.normalize(text));
   }
 
-  static createFromExistingSlug(value: string) {
-    if (!Slug.isValid(value)) throw new Error('Invalid slug');
-    return new Slug(value);
+  static createFromExistingSlug(value: string): Either<InvalidSlugError, Slug> {
+    if (!Slug.isValid(value)) return left(new InvalidSlugError());
+    return right(new Slug(value));
   }
 
   private static isValid(value: string) {

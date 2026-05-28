@@ -38,7 +38,7 @@ describe('Comment On Answer', () => {
     const input: CommentOnAnswerUseCaseInput = {
       content: 'This is a comment',
       answerId: exampleAnswer.id.toString(),
-      authorId: new UniqueEntityId().toString(),
+      authorId: UniqueEntityId.create().toString(),
     };
 
     const result = await sut.execute(input);
@@ -56,8 +56,8 @@ describe('Comment On Answer', () => {
   it('should not be able to comment on a non existing answer', async () => {
     const result = await sut.execute({
       content: 'This is a comment',
-      answerId: 'non-existing-answer-id',
-      authorId: 'any-author-id',
+      answerId: UniqueEntityId.create().toString(),
+      authorId: UniqueEntityId.create().toString(),
     });
 
     assertEitherIsLeft(result);

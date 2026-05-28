@@ -1,9 +1,12 @@
 import { Answer } from '../entities/answer';
-import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id/index';
+import {
+  InvalidUniqueEntityIdError,
+  UniqueEntityId,
+} from '@/shared/entities/value-objects/unique-entity-id/index';
 import type { AnswerRepository } from '../repositories/answer-repository';
 import { AnswerAttachment } from '../entities/answer-attachment';
 import { AnswerAttachmentList } from '../entities/answer-attachment-list';
-import { Either, right } from 'fp-ts/lib/Either';
+import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { DomainEvents } from '@/shared/events/domain-events';
 
 export interface AnswerQuestionUseCaseInput {
@@ -26,19 +29,40 @@ export class AnswerQuestionUseCase {
     content,
     attachmentIds,
   }: AnswerQuestionUseCaseInput): Promise<
-    Either<never, AnswerQuestionUseCaseOutput>
+    Either<InvalidUniqueEntityIdError, AnswerQuestionUseCaseOutput>
   > {
+    const questionIdOrError = UniqueEntityId.createFromExistingId(questionId);
+    const authorIdOrError = UniqueEntityId.createFromExistingId(authorId);
+
+    if (isLeft(questionIdOrError)) {
+      return left(new InvalidUniqueEntityIdError('Question'));
+    }
+
+    if (isLeft(authorIdOrError)) {
+      return left(new InvalidUniqueEntityIdError('Author'));
+    }
+
     const answer = new Answer({
       content,
-      questionId: new UniqueEntityId(questionId),
-      authorId: new UniqueEntityId(authorId),
+      questionId: questionIdOrError.right,
+      authorId: authorIdOrError.right,
     });
 
-    const answerAttachments = attachmentIds.map((attachmentId) => {
-      return new AnswerAttachment({
-        answerId: answer.id,
-        attachmentId: new UniqueEntityId(attachmentId),
-      });
+    const answerAttachments: AnswerAttachment[] = [];
+    attachmentIds.forEach((attachmentId) => {
+      const attachmentIdOrError =
+        UniqueEntityId.createFromExistingId(attachmentId);
+
+      if (isLeft(attachmentIdOrError)) {
+        return left(new InvalidUniqueEntityIdError('Attachment'));
+      }
+
+      answerAttachments.push(
+        new AnswerAttachment({
+          answerId: answer.id,
+          attachmentId: attachmentIdOrError.right,
+        }),
+      );
     });
 
     answer.attachments = new AnswerAttachmentList(answerAttachments);
