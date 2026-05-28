@@ -1,18 +1,26 @@
 import { UserModel } from '@/infra/database/prisma/generated/models';
 import { ZodValidationPipe } from '@/infra/pipes/zod-validation-pipe';
 import { JwtAuthGuard } from '@/infra/resources/auth/jwt-auth.guard';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { CurrentUser } from '../auth/current-user-decorator';
 import {
   CreateQuestionBody,
   createQuestionBodySchema,
   CreateQuestionService,
 } from './services/create-question.service';
+import {
+  FetchRecentQuestionsService,
+  PageQueryParam,
+  pageQueryParamSchema,
+} from './services/fetch-recent-questions.service';
 
 @Controller('questions')
 @UseGuards(JwtAuthGuard)
 export class QuestionController {
-  constructor(private readonly createQuestionService: CreateQuestionService) {}
+  constructor(
+    private readonly createQuestionService: CreateQuestionService,
+    private readonly fetchRecentQuestionsService: FetchRecentQuestionsService,
+  ) {}
 
   @Post()
   create(
@@ -21,5 +29,13 @@ export class QuestionController {
     @CurrentUser() user: UserModel,
   ) {
     return this.createQuestionService.execute(body, user.id);
+  }
+
+  @Get()
+  fetchRecent(
+    @Query('page', new ZodValidationPipe(pageQueryParamSchema))
+    page: PageQueryParam,
+  ) {
+    return this.fetchRecentQuestionsService.execute(page);
   }
 }
