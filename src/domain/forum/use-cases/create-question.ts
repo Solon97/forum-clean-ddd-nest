@@ -13,7 +13,7 @@ export interface CreateQuestionUseCaseInput {
 }
 
 export interface CreateQuestionUseCaseOutput {
-  question: Question;
+  id: string;
 }
 
 export class CreateQuestionUseCase {
@@ -45,7 +45,7 @@ export class CreateQuestionUseCase {
     await this.questionRepository.create(question);
 
     return right({
-      question,
+      id: question.id.toString(),
     });
   }
 }

@@ -1,5 +1,5 @@
 import { AppModule } from '@/infra/app.module';
-import { SignupService } from '@/infra/auth/services/signup.service';
+import { SignupService } from '@/infra/resources/auth/services/signup.service';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import type { Server } from 'node:http';

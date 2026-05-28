@@ -1,7 +1,11 @@
 import { Module } from '@nestjs/common';
-import { CreateQuestionController } from './controllers/create-question.controller';
+import { QuestionController } from './question.controller';
+import { DatabaseModule } from '@/infra/database/database.module';
+import { CreateQuestionService } from './services/create-question.service';
 
 @Module({
-  controllers: [CreateQuestionController],
+  imports: [DatabaseModule],
+  controllers: [QuestionController],
+  providers: [CreateQuestionService],
 })
 export class QuestionModule {}

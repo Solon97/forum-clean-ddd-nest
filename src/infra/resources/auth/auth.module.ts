@@ -7,9 +7,11 @@ import { JwtStrategy } from './jwt.strategy';
 import { SigninService } from './services/signin.service';
 import { SignupService } from './services/signup.service';
 import { TokenService } from './services/tokens.service';
+import { DatabaseModule } from '@/infra/database/database.module';
 
 @Module({
   imports: [
+    DatabaseModule,
     PassportModule,
     JwtModule.registerAsync({
       inject: [EnvConfigService],
