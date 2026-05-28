@@ -11,7 +11,7 @@ export default async function globalSetup() {
   process.env.DATABASE_URL = container.getConnectionUri();
 
   execSync('pnpm prisma migrate deploy', {
-    stdio: 'inherit',
+    stdio: ['ignore'],
     env: process.env,
   });
 

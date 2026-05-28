@@ -1,12 +1,12 @@
 import { CreateQuestionUseCase } from '@/domain/forum/use-cases/create-question';
 import { PrismaQuestionRepository } from '@/infra/database/prisma/repositories/prisma-question-repository';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { isLeft } from 'fp-ts/lib/Either';
 import z from 'zod';
 
 export const createQuestionBodySchema = z.object({
-  title: z.string(),
-  content: z.string(),
+  title: z.string().min(1, 'Title is required'),
+  content: z.string().min(1, 'Content is required'),
 });
 
 export type CreateQuestionBody = z.infer<typeof createQuestionBodySchema>;
@@ -26,7 +26,7 @@ export class CreateQuestionService {
     });
 
     if (isLeft(result)) {
-      throw new InternalServerErrorException('Failed to create question');
+      throw new BadRequestException(result.left.message);
     }
 
     return { id: result.right.question.id.toString() };

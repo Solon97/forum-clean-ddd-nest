@@ -50,4 +50,29 @@ describe('Create Question E2E Test', () => {
     expect(question?.title).toBe('Test Question');
     expect(question?.content).toBe('This is a test question');
   });
+
+  test('[POST] /questions - should return 400 if data is invalid', async () => {
+    const { accessToken } = await authenticateUserE2ETest(app);
+
+    const response = await request(app.getHttpServer())
+      .post('/questions')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        title: '',
+        content: '',
+      });
+
+    expect(response.status).toBe(400);
+  });
+
+  test('[POST] /questions - should return 401 if user is not authenticated', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/questions')
+      .send({
+        title: 'Test Question',
+        content: 'This is a test question',
+      });
+
+    expect(response.status).toBe(401);
+  });
 });
