@@ -6,7 +6,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
+import { RefreshService } from './services/refresh.service';
 import { SigninService } from './services/signin.service';
+import { SignoutService } from './services/signout.service';
 import { SignupService } from './services/signup.service';
 import { TokenService } from './services/tokens.service';
 
@@ -34,6 +36,8 @@ import { TokenService } from './services/tokens.service';
     JwtStrategy,
     SigninService,
     SignupService,
+    RefreshService,
+    SignoutService,
     TokenService,
     BcryptHasher,
   ],

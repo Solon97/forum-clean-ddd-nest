@@ -11,18 +11,20 @@ import {
   signupBodySchema,
   SignupService,
 } from './services/signup.service';
-import { TokenService } from './services/tokens.service';
 import { RequestRefreshToken } from './tokens-decorator';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { CurrentUser } from './current-user-decorator';
 import { UserModel } from '@/infra/database/prisma/generated/models';
+import { RefreshService } from './services/refresh.service';
+import { SignoutService } from './services/signout.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly signupService: SignupService,
     private readonly signinService: SigninService,
-    private readonly tokenService: TokenService,
+    private readonly refreshService: RefreshService,
+    private readonly signoutService: SignoutService,
   ) {}
 
   @Post('signup')
@@ -40,12 +42,12 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(RefreshTokenGuard)
   async refresh(@RequestRefreshToken() refreshToken: string) {
-    return this.tokenService.refreshTokens(refreshToken);
+    return this.refreshService.execute(refreshToken);
   }
 
   @Post('signout')
   @UseGuards(JwtAuthGuard)
   async signout(@CurrentUser() user: UserModel) {
-    return this.tokenService.revokeUserTokens(user.id);
+    return this.signoutService.execute(user.id);
   }
 }
