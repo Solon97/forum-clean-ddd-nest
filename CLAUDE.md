@@ -72,6 +72,14 @@ When writing E2E tests:
 - File pattern: `*.e2e-spec.ts`
 - Use `@testcontainers/postgresql` — no manual DB setup needed
 - Check `test/e2e/global-setup-e2e.ts` and `test/e2e/setup-e2e.ts` for bootstrap logic
+- Follow the repository E2E projects convention in `vitest.config.e2e.ts`:
+	- tests are grouped by resource with project names `<resource>-e2e`
+	- each project includes only files from `src/infra/resources/<resource>/__test__/`
+	- do not add a global E2E `include` at root config level
+- When creating E2E tests for a new resource, also update:
+	- `test.projects` in `vitest.config.e2e.ts`
+	- `package.json` with `test:e2e:<resource>` script
+- Prefer resource-scoped runs while implementing (`pnpm test:e2e:<resource>`) and full suite before finishing (`pnpm test:e2e`).
 
 ---
 

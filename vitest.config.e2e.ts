@@ -6,10 +6,32 @@ export default defineConfig({
   test: {
     globalSetup: ['./test/e2e/global-setup-e2e.ts'],
     setupFiles: ['./test/e2e/setup-e2e.ts'],
-    include: ['**/*.e2e-spec.ts'],
     globals: true,
     root: './',
     maxWorkers: 1,
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'auth-e2e',
+          include: ['src/infra/resources/auth/__test__/**/*.e2e-spec.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'question-e2e',
+          include: ['src/infra/resources/question/__test__/**/*.e2e-spec.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'answer-e2e',
+          include: ['src/infra/resources/answer/__test__/**/*.e2e-spec.ts'],
+        },
+      },
+    ],
   },
   plugins: [
     tsConfigPaths(),

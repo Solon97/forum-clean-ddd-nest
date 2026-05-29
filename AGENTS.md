@@ -14,6 +14,9 @@ pnpm start:dev            # Dev server (watch mode) on port 3000
 pnpm test                 # Unit tests (Vitest)
 pnpm test:watch           # Unit tests in watch mode
 pnpm test:e2e             # E2E tests (requires Docker — uses TestContainers)
+pnpm test:e2e:auth        # E2E for auth resource only
+pnpm test:e2e:question    # E2E for question resource only
+pnpm test:e2e:answer      # E2E for answer resource only
 pnpm test:cov             # Coverage report
 pnpm build                # Compile to dist/
 pnpm lint                 # ESLint with auto-fix
@@ -126,6 +129,12 @@ JWT keys must be RS256 RSA keys stored in `keys/` and exported as base64. See do
 
 - **Unit tests** (`*.spec.ts`): Use in-memory repositories from `test/repositories/`. No NestJS module, no DB.
 - **E2E tests** (`*.e2e-spec.ts`): Use TestContainers (PostgreSQL), NestJS testing module, `supertest`.
+- **E2E by resource (mandatory convention):** Group tests using Vitest `test.projects` in `vitest.config.e2e.ts`.
+- Project names must follow `<resource>-e2e` (`auth-e2e`, `question-e2e`, `answer-e2e`).
+- Each project must own only its resource test files via `include` globs under `src/infra/resources/<resource>/__test__/`.
+- Root E2E config must not define a global `include`; includes belong to projects only.
+- When adding a new resource E2E suite, also add a project entry in `vitest.config.e2e.ts` and a matching npm script `test:e2e:<resource>` in `package.json`.
+- Prefer running targeted resource suites during development (`pnpm test:e2e:<resource>`); run full E2E before merge (`pnpm test:e2e`).
 - Use `assertEitherIsRight(result)` / `assertEitherIsLeft(result)` from `test/helpers/assert-either.ts`.
 - Entity factories live in `test/factories/` — always use factories over inline entity creation.
 - `vitest.config.e2e.ts` sets `maxWorkers: 1` — E2E tests run sequentially.

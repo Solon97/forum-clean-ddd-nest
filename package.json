@@ -17,7 +17,10 @@
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --inspect --logHeapUsage --threads=false",
-    "test:e2e": "vitest run --config ./vitest.config.e2e.ts"
+    "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
+    "test:e2e:auth": "vitest run --config ./vitest.config.e2e.ts --project auth-e2e",
+    "test:e2e:question": "vitest run --config ./vitest.config.e2e.ts --project question-e2e",
+    "test:e2e:answer": "vitest run --config ./vitest.config.e2e.ts --project answer-e2e"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
