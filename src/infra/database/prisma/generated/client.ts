@@ -59,3 +59,18 @@ export type Question = Prisma.QuestionModel
  * 
  */
 export type Answer = Prisma.AnswerModel
+/**
+ * Model Comment
+ * 
+ */
+export type Comment = Prisma.CommentModel
+/**
+ * Model Attachment
+ * 
+ */
+export type Attachment = Prisma.AttachmentModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel

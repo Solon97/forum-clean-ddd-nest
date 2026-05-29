@@ -209,6 +209,8 @@ export type QuestionWhereInput = {
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   bestAnswer?: Prisma.XOR<Prisma.AnswerNullableScalarRelationFilter, Prisma.AnswerWhereInput> | null
   answers?: Prisma.AnswerListRelationFilter
+  comments?: Prisma.CommentListRelationFilter
+  attachments?: Prisma.AttachmentListRelationFilter
 }
 
 export type QuestionOrderByWithRelationInput = {
@@ -223,6 +225,8 @@ export type QuestionOrderByWithRelationInput = {
   author?: Prisma.UserOrderByWithRelationInput
   bestAnswer?: Prisma.AnswerOrderByWithRelationInput
   answers?: Prisma.AnswerOrderByRelationAggregateInput
+  comments?: Prisma.CommentOrderByRelationAggregateInput
+  attachments?: Prisma.AttachmentOrderByRelationAggregateInput
 }
 
 export type QuestionWhereUniqueInput = Prisma.AtLeast<{
@@ -240,6 +244,8 @@ export type QuestionWhereUniqueInput = Prisma.AtLeast<{
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   bestAnswer?: Prisma.XOR<Prisma.AnswerNullableScalarRelationFilter, Prisma.AnswerWhereInput> | null
   answers?: Prisma.AnswerListRelationFilter
+  comments?: Prisma.CommentListRelationFilter
+  attachments?: Prisma.AttachmentListRelationFilter
 }, "id" | "slug" | "bestAnswerId">
 
 export type QuestionOrderByWithAggregationInput = {
@@ -280,6 +286,8 @@ export type QuestionCreateInput = {
   author: Prisma.UserCreateNestedOneWithoutQuestionsInput
   bestAnswer?: Prisma.AnswerCreateNestedOneWithoutBestAnswerOnInput
   answers?: Prisma.AnswerCreateNestedManyWithoutQuestionInput
+  comments?: Prisma.CommentCreateNestedManyWithoutQuestionInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionUncheckedCreateInput = {
@@ -292,6 +300,8 @@ export type QuestionUncheckedCreateInput = {
   authorId: string
   bestAnswerId?: string | null
   answers?: Prisma.AnswerUncheckedCreateNestedManyWithoutQuestionInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutQuestionInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionUpdateInput = {
@@ -304,6 +314,8 @@ export type QuestionUpdateInput = {
   author?: Prisma.UserUpdateOneRequiredWithoutQuestionsNestedInput
   bestAnswer?: Prisma.AnswerUpdateOneWithoutBestAnswerOnNestedInput
   answers?: Prisma.AnswerUpdateManyWithoutQuestionNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutQuestionNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateInput = {
@@ -316,6 +328,8 @@ export type QuestionUncheckedUpdateInput = {
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   bestAnswerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answers?: Prisma.AnswerUncheckedUpdateManyWithoutQuestionNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutQuestionNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionCreateManyInput = {
@@ -494,6 +508,38 @@ export type QuestionUncheckedUpdateOneWithoutBestAnswerNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.QuestionUpdateToOneWithWhereWithoutBestAnswerInput, Prisma.QuestionUpdateWithoutBestAnswerInput>, Prisma.QuestionUncheckedUpdateWithoutBestAnswerInput>
 }
 
+export type QuestionCreateNestedOneWithoutCommentsInput = {
+  create?: Prisma.XOR<Prisma.QuestionCreateWithoutCommentsInput, Prisma.QuestionUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.QuestionCreateOrConnectWithoutCommentsInput
+  connect?: Prisma.QuestionWhereUniqueInput
+}
+
+export type QuestionUpdateOneWithoutCommentsNestedInput = {
+  create?: Prisma.XOR<Prisma.QuestionCreateWithoutCommentsInput, Prisma.QuestionUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.QuestionCreateOrConnectWithoutCommentsInput
+  upsert?: Prisma.QuestionUpsertWithoutCommentsInput
+  disconnect?: Prisma.QuestionWhereInput | boolean
+  delete?: Prisma.QuestionWhereInput | boolean
+  connect?: Prisma.QuestionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.QuestionUpdateToOneWithWhereWithoutCommentsInput, Prisma.QuestionUpdateWithoutCommentsInput>, Prisma.QuestionUncheckedUpdateWithoutCommentsInput>
+}
+
+export type QuestionCreateNestedOneWithoutAttachmentsInput = {
+  create?: Prisma.XOR<Prisma.QuestionCreateWithoutAttachmentsInput, Prisma.QuestionUncheckedCreateWithoutAttachmentsInput>
+  connectOrCreate?: Prisma.QuestionCreateOrConnectWithoutAttachmentsInput
+  connect?: Prisma.QuestionWhereUniqueInput
+}
+
+export type QuestionUpdateOneWithoutAttachmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.QuestionCreateWithoutAttachmentsInput, Prisma.QuestionUncheckedCreateWithoutAttachmentsInput>
+  connectOrCreate?: Prisma.QuestionCreateOrConnectWithoutAttachmentsInput
+  upsert?: Prisma.QuestionUpsertWithoutAttachmentsInput
+  disconnect?: Prisma.QuestionWhereInput | boolean
+  delete?: Prisma.QuestionWhereInput | boolean
+  connect?: Prisma.QuestionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.QuestionUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.QuestionUpdateWithoutAttachmentsInput>, Prisma.QuestionUncheckedUpdateWithoutAttachmentsInput>
+}
+
 export type QuestionCreateWithoutAuthorInput = {
   id?: string
   title: string
@@ -503,6 +549,8 @@ export type QuestionCreateWithoutAuthorInput = {
   updatedAt?: Date | string
   bestAnswer?: Prisma.AnswerCreateNestedOneWithoutBestAnswerOnInput
   answers?: Prisma.AnswerCreateNestedManyWithoutQuestionInput
+  comments?: Prisma.CommentCreateNestedManyWithoutQuestionInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionUncheckedCreateWithoutAuthorInput = {
@@ -514,6 +562,8 @@ export type QuestionUncheckedCreateWithoutAuthorInput = {
   updatedAt?: Date | string
   bestAnswerId?: string | null
   answers?: Prisma.AnswerUncheckedCreateNestedManyWithoutQuestionInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutQuestionInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionCreateOrConnectWithoutAuthorInput = {
@@ -565,6 +615,8 @@ export type QuestionCreateWithoutBestAnswerInput = {
   updatedAt?: Date | string
   author: Prisma.UserCreateNestedOneWithoutQuestionsInput
   answers?: Prisma.AnswerCreateNestedManyWithoutQuestionInput
+  comments?: Prisma.CommentCreateNestedManyWithoutQuestionInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionUncheckedCreateWithoutBestAnswerInput = {
@@ -576,6 +628,8 @@ export type QuestionUncheckedCreateWithoutBestAnswerInput = {
   updatedAt?: Date | string
   authorId: string
   answers?: Prisma.AnswerUncheckedCreateNestedManyWithoutQuestionInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutQuestionInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionCreateOrConnectWithoutBestAnswerInput = {
@@ -592,6 +646,8 @@ export type QuestionCreateWithoutAnswersInput = {
   updatedAt?: Date | string
   author: Prisma.UserCreateNestedOneWithoutQuestionsInput
   bestAnswer?: Prisma.AnswerCreateNestedOneWithoutBestAnswerOnInput
+  comments?: Prisma.CommentCreateNestedManyWithoutQuestionInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionUncheckedCreateWithoutAnswersInput = {
@@ -603,6 +659,8 @@ export type QuestionUncheckedCreateWithoutAnswersInput = {
   updatedAt?: Date | string
   authorId: string
   bestAnswerId?: string | null
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutQuestionInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionCreateOrConnectWithoutAnswersInput = {
@@ -630,6 +688,8 @@ export type QuestionUpdateWithoutBestAnswerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.UserUpdateOneRequiredWithoutQuestionsNestedInput
   answers?: Prisma.AnswerUpdateManyWithoutQuestionNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutQuestionNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateWithoutBestAnswerInput = {
@@ -641,6 +701,8 @@ export type QuestionUncheckedUpdateWithoutBestAnswerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   answers?: Prisma.AnswerUncheckedUpdateManyWithoutQuestionNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutQuestionNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUpsertWithoutAnswersInput = {
@@ -663,6 +725,8 @@ export type QuestionUpdateWithoutAnswersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.UserUpdateOneRequiredWithoutQuestionsNestedInput
   bestAnswer?: Prisma.AnswerUpdateOneWithoutBestAnswerOnNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutQuestionNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateWithoutAnswersInput = {
@@ -674,6 +738,144 @@ export type QuestionUncheckedUpdateWithoutAnswersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   bestAnswerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutQuestionNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutQuestionNestedInput
+}
+
+export type QuestionCreateWithoutCommentsInput = {
+  id?: string
+  title: string
+  slug: string
+  content: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  author: Prisma.UserCreateNestedOneWithoutQuestionsInput
+  bestAnswer?: Prisma.AnswerCreateNestedOneWithoutBestAnswerOnInput
+  answers?: Prisma.AnswerCreateNestedManyWithoutQuestionInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutQuestionInput
+}
+
+export type QuestionUncheckedCreateWithoutCommentsInput = {
+  id?: string
+  title: string
+  slug: string
+  content: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  authorId: string
+  bestAnswerId?: string | null
+  answers?: Prisma.AnswerUncheckedCreateNestedManyWithoutQuestionInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutQuestionInput
+}
+
+export type QuestionCreateOrConnectWithoutCommentsInput = {
+  where: Prisma.QuestionWhereUniqueInput
+  create: Prisma.XOR<Prisma.QuestionCreateWithoutCommentsInput, Prisma.QuestionUncheckedCreateWithoutCommentsInput>
+}
+
+export type QuestionUpsertWithoutCommentsInput = {
+  update: Prisma.XOR<Prisma.QuestionUpdateWithoutCommentsInput, Prisma.QuestionUncheckedUpdateWithoutCommentsInput>
+  create: Prisma.XOR<Prisma.QuestionCreateWithoutCommentsInput, Prisma.QuestionUncheckedCreateWithoutCommentsInput>
+  where?: Prisma.QuestionWhereInput
+}
+
+export type QuestionUpdateToOneWithWhereWithoutCommentsInput = {
+  where?: Prisma.QuestionWhereInput
+  data: Prisma.XOR<Prisma.QuestionUpdateWithoutCommentsInput, Prisma.QuestionUncheckedUpdateWithoutCommentsInput>
+}
+
+export type QuestionUpdateWithoutCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  author?: Prisma.UserUpdateOneRequiredWithoutQuestionsNestedInput
+  bestAnswer?: Prisma.AnswerUpdateOneWithoutBestAnswerOnNestedInput
+  answers?: Prisma.AnswerUpdateManyWithoutQuestionNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutQuestionNestedInput
+}
+
+export type QuestionUncheckedUpdateWithoutCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  bestAnswerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answers?: Prisma.AnswerUncheckedUpdateManyWithoutQuestionNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutQuestionNestedInput
+}
+
+export type QuestionCreateWithoutAttachmentsInput = {
+  id?: string
+  title: string
+  slug: string
+  content: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  author: Prisma.UserCreateNestedOneWithoutQuestionsInput
+  bestAnswer?: Prisma.AnswerCreateNestedOneWithoutBestAnswerOnInput
+  answers?: Prisma.AnswerCreateNestedManyWithoutQuestionInput
+  comments?: Prisma.CommentCreateNestedManyWithoutQuestionInput
+}
+
+export type QuestionUncheckedCreateWithoutAttachmentsInput = {
+  id?: string
+  title: string
+  slug: string
+  content: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  authorId: string
+  bestAnswerId?: string | null
+  answers?: Prisma.AnswerUncheckedCreateNestedManyWithoutQuestionInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutQuestionInput
+}
+
+export type QuestionCreateOrConnectWithoutAttachmentsInput = {
+  where: Prisma.QuestionWhereUniqueInput
+  create: Prisma.XOR<Prisma.QuestionCreateWithoutAttachmentsInput, Prisma.QuestionUncheckedCreateWithoutAttachmentsInput>
+}
+
+export type QuestionUpsertWithoutAttachmentsInput = {
+  update: Prisma.XOR<Prisma.QuestionUpdateWithoutAttachmentsInput, Prisma.QuestionUncheckedUpdateWithoutAttachmentsInput>
+  create: Prisma.XOR<Prisma.QuestionCreateWithoutAttachmentsInput, Prisma.QuestionUncheckedCreateWithoutAttachmentsInput>
+  where?: Prisma.QuestionWhereInput
+}
+
+export type QuestionUpdateToOneWithWhereWithoutAttachmentsInput = {
+  where?: Prisma.QuestionWhereInput
+  data: Prisma.XOR<Prisma.QuestionUpdateWithoutAttachmentsInput, Prisma.QuestionUncheckedUpdateWithoutAttachmentsInput>
+}
+
+export type QuestionUpdateWithoutAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  author?: Prisma.UserUpdateOneRequiredWithoutQuestionsNestedInput
+  bestAnswer?: Prisma.AnswerUpdateOneWithoutBestAnswerOnNestedInput
+  answers?: Prisma.AnswerUpdateManyWithoutQuestionNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutQuestionNestedInput
+}
+
+export type QuestionUncheckedUpdateWithoutAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  bestAnswerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answers?: Prisma.AnswerUncheckedUpdateManyWithoutQuestionNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionCreateManyAuthorInput = {
@@ -695,6 +897,8 @@ export type QuestionUpdateWithoutAuthorInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bestAnswer?: Prisma.AnswerUpdateOneWithoutBestAnswerOnNestedInput
   answers?: Prisma.AnswerUpdateManyWithoutQuestionNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutQuestionNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateWithoutAuthorInput = {
@@ -706,6 +910,8 @@ export type QuestionUncheckedUpdateWithoutAuthorInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bestAnswerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answers?: Prisma.AnswerUncheckedUpdateManyWithoutQuestionNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutQuestionNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateManyWithoutAuthorInput = {
@@ -725,10 +931,14 @@ export type QuestionUncheckedUpdateManyWithoutAuthorInput = {
 
 export type QuestionCountOutputType = {
   answers: number
+  comments: number
+  attachments: number
 }
 
 export type QuestionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   answers?: boolean | QuestionCountOutputTypeCountAnswersArgs
+  comments?: boolean | QuestionCountOutputTypeCountCommentsArgs
+  attachments?: boolean | QuestionCountOutputTypeCountAttachmentsArgs
 }
 
 /**
@@ -748,6 +958,20 @@ export type QuestionCountOutputTypeCountAnswersArgs<ExtArgs extends runtime.Type
   where?: Prisma.AnswerWhereInput
 }
 
+/**
+ * QuestionCountOutputType without action
+ */
+export type QuestionCountOutputTypeCountCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CommentWhereInput
+}
+
+/**
+ * QuestionCountOutputType without action
+ */
+export type QuestionCountOutputTypeCountAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AttachmentWhereInput
+}
+
 
 export type QuestionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -761,6 +985,8 @@ export type QuestionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   bestAnswer?: boolean | Prisma.Question$bestAnswerArgs<ExtArgs>
   answers?: boolean | Prisma.Question$answersArgs<ExtArgs>
+  comments?: boolean | Prisma.Question$commentsArgs<ExtArgs>
+  attachments?: boolean | Prisma.Question$attachmentsArgs<ExtArgs>
   _count?: boolean | Prisma.QuestionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["question"]>
 
@@ -806,6 +1032,8 @@ export type QuestionInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   bestAnswer?: boolean | Prisma.Question$bestAnswerArgs<ExtArgs>
   answers?: boolean | Prisma.Question$answersArgs<ExtArgs>
+  comments?: boolean | Prisma.Question$commentsArgs<ExtArgs>
+  attachments?: boolean | Prisma.Question$attachmentsArgs<ExtArgs>
   _count?: boolean | Prisma.QuestionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type QuestionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -823,6 +1051,8 @@ export type $QuestionPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     author: Prisma.$UserPayload<ExtArgs>
     bestAnswer: Prisma.$AnswerPayload<ExtArgs> | null
     answers: Prisma.$AnswerPayload<ExtArgs>[]
+    comments: Prisma.$CommentPayload<ExtArgs>[]
+    attachments: Prisma.$AttachmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1230,6 +1460,8 @@ export interface Prisma__QuestionClient<T, Null = never, ExtArgs extends runtime
   author<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   bestAnswer<T extends Prisma.Question$bestAnswerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Question$bestAnswerArgs<ExtArgs>>): Prisma.Prisma__AnswerClient<runtime.Types.Result.GetResult<Prisma.$AnswerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   answers<T extends Prisma.Question$answersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Question$answersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  comments<T extends Prisma.Question$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Question$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  attachments<T extends Prisma.Question$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Question$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1708,6 +1940,54 @@ export type Question$answersArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.AnswerScalarFieldEnum | Prisma.AnswerScalarFieldEnum[]
+}
+
+/**
+ * Question.comments
+ */
+export type Question$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Comment
+   */
+  select?: Prisma.CommentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Comment
+   */
+  omit?: Prisma.CommentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CommentInclude<ExtArgs> | null
+  where?: Prisma.CommentWhereInput
+  orderBy?: Prisma.CommentOrderByWithRelationInput | Prisma.CommentOrderByWithRelationInput[]
+  cursor?: Prisma.CommentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CommentScalarFieldEnum | Prisma.CommentScalarFieldEnum[]
+}
+
+/**
+ * Question.attachments
+ */
+export type Question$attachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Attachment
+   */
+  select?: Prisma.AttachmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Attachment
+   */
+  omit?: Prisma.AttachmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AttachmentInclude<ExtArgs> | null
+  where?: Prisma.AttachmentWhereInput
+  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[]
+  cursor?: Prisma.AttachmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
 }
 
 /**
