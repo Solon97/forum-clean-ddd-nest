@@ -4,6 +4,7 @@ import { PrismaAnswerCommentRepository } from './repositories/prisma-answer-comm
 import { PrismaAnswerRepository } from './repositories/prisma-answer-repository';
 import { PrismaQuestionAttachmentsRepository } from './repositories/prisma-question-attachments-repository';
 import { PrismaService } from './prisma.service';
+import { PrismaQuestionCommentRepository } from './repositories/prisma-question-comment-repository';
 import { PrismaQuestionRepository } from './repositories/prisma-question-repository';
 import { PrismaRefreshTokenRepository } from './repositories/prisma-refresh-token-repository';
 import { PrismaUserRepository } from './repositories/prisma-user-repository';
@@ -15,6 +16,7 @@ import { PrismaUserRepository } from './repositories/prisma-user-repository';
     PrismaAnswerCommentRepository,
     PrismaAnswerRepository,
     PrismaQuestionAttachmentsRepository,
+    PrismaQuestionCommentRepository,
     PrismaQuestionRepository,
     PrismaUserRepository,
     PrismaRefreshTokenRepository,
@@ -25,6 +27,7 @@ import { PrismaUserRepository } from './repositories/prisma-user-repository';
     PrismaAnswerCommentRepository,
     PrismaAnswerRepository,
     PrismaQuestionAttachmentsRepository,
+    PrismaQuestionCommentRepository,
     PrismaQuestionRepository,
     PrismaUserRepository,
     PrismaRefreshTokenRepository,

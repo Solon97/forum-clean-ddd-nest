@@ -12,11 +12,26 @@ import {
 } from '@nestjs/common';
 import { CurrentUser } from '../auth/current-user-decorator';
 import {
+  CommentOnQuestionBody,
+  commentOnQuestionBodySchema,
+  CommentOnQuestionService,
+} from './services/comment-on-question.service';
+import {
   CreateQuestionBody,
   createQuestionBodySchema,
   CreateQuestionService,
 } from './services/create-question.service';
+import {
+  DeleteQuestionCommentService,
+  QuestionCommentIdParam,
+  questionCommentIdParamSchema,
+} from './services/delete-question-comment.service';
 import { DeleteQuestionService } from './services/delete-question.service';
+import {
+  FetchQuestionCommentsPageQueryParam,
+  fetchQuestionCommentsPageQueryParamSchema,
+  FetchQuestionCommentsService,
+} from './services/fetch-question-comments.service';
 import {
   FetchRecentQuestionsService,
   PageQueryParam,
@@ -43,6 +58,9 @@ export class QuestionController {
     private readonly getQuestionBySlugService: GetQuestionBySlugService,
     private readonly updateQuestionService: UpdateQuestionService,
     private readonly deleteQuestionService: DeleteQuestionService,
+    private readonly commentOnQuestionService: CommentOnQuestionService,
+    private readonly fetchQuestionCommentsService: FetchQuestionCommentsService,
+    private readonly deleteQuestionCommentService: DeleteQuestionCommentService,
   ) {}
 
   @Post()
@@ -88,5 +106,38 @@ export class QuestionController {
     @CurrentUser() user: UserModel,
   ) {
     return this.deleteQuestionService.execute(questionId, user.id);
+  }
+
+  @Post(':questionId/comments')
+  comment(
+    @Body(new ZodValidationPipe(commentOnQuestionBodySchema))
+    body: CommentOnQuestionBody,
+    @Param('questionId', new ZodValidationPipe(questionIdParamSchema))
+    questionId: QuestionIdParam,
+    @CurrentUser() user: UserModel,
+  ) {
+    return this.commentOnQuestionService.execute(body, user.id, questionId);
+  }
+
+  @Get(':questionId/comments')
+  fetchComments(
+    @Param('questionId', new ZodValidationPipe(questionIdParamSchema))
+    questionId: QuestionIdParam,
+    @Query(
+      'page',
+      new ZodValidationPipe(fetchQuestionCommentsPageQueryParamSchema),
+    )
+    page: FetchQuestionCommentsPageQueryParam,
+  ) {
+    return this.fetchQuestionCommentsService.execute(questionId, page);
+  }
+
+  @Delete('comments/:commentId')
+  removeComment(
+    @Param('commentId', new ZodValidationPipe(questionCommentIdParamSchema))
+    commentId: QuestionCommentIdParam,
+    @CurrentUser() user: UserModel,
+  ) {
+    return this.deleteQuestionCommentService.execute(commentId, user.id);
   }
 }
