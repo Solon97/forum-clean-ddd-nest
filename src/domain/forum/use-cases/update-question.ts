@@ -53,7 +53,8 @@ export class UpdateQuestionUseCase {
 
     const newQuestionAttachments: QuestionAttachment[] = [];
     for (const attachmentId of attachmentIds) {
-      const attachmentIdOrError = UniqueEntityId.createFromExistingId(attachmentId);
+      const attachmentIdOrError =
+        UniqueEntityId.createFromExistingId(attachmentId);
       if (isLeft(attachmentIdOrError)) {
         return left(new InvalidUniqueEntityIdError('Attachment'));
       }

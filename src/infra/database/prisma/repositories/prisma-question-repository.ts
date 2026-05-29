@@ -4,7 +4,7 @@ import { PaginationParams } from '@/shared/repositories/pagination-params';
 import { Injectable } from '@nestjs/common';
 import { PrismaQuestionMapper } from '../mappers/prisma-question-mapper';
 import { PrismaService } from '../prisma.service';
-import { isLeft } from 'fp-ts/lib/These';
+import { isLeft } from 'fp-ts/lib/Either';
 
 @Injectable()
 export class PrismaQuestionRepository implements QuestionRepository {
@@ -19,11 +19,49 @@ export class PrismaQuestionRepository implements QuestionRepository {
 
   async update(question: Question): Promise<void> {
     const data = PrismaQuestionMapper.toPrisma(question);
-    await this.prismaService.question.update({
-      where: {
-        id: data.id,
-      },
-      data,
+
+    const newAttachmentIds = question.attachments.newItems.map((attachment) =>
+      attachment.attachmentId.toString(),
+    );
+
+    const removedAttachmentIds = question.attachments.removedItems.map(
+      (attachment) => attachment.attachmentId.toString(),
+    );
+
+    await this.prismaService.$transaction(async (tx) => {
+      await tx.question.update({
+        where: {
+          id: data.id,
+        },
+        data,
+      });
+
+      if (newAttachmentIds.length > 0) {
+        await tx.attachment.updateMany({
+          where: {
+            id: {
+              in: newAttachmentIds,
+            },
+          },
+          data: {
+            questionId: data.id,
+          },
+        });
+      }
+
+      if (removedAttachmentIds.length > 0) {
+        await tx.attachment.updateMany({
+          where: {
+            id: {
+              in: removedAttachmentIds,
+            },
+            questionId: data.id,
+          },
+          data: {
+            questionId: null,
+          },
+        });
+      }
     });
   }
 
