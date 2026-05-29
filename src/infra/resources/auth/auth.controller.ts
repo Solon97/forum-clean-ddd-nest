@@ -1,3 +1,4 @@
+import { UserModel } from '@/infra/database/prisma/generated/models';
 import { ZodValidationPipe } from '@/infra/pipes/zod-validation-pipe';
 import {
   Body,
@@ -7,23 +8,22 @@ import {
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
+import { CurrentUser } from './current-user-decorator';
+import { Public } from './public';
 import { RefreshTokenGuard } from './refresh-auth.guard';
+import { RefreshService } from './services/refresh.service';
 import {
   SigninBody,
   signinBodySchema,
   SigninService,
 } from './services/signin.service';
+import { SignoutService } from './services/signout.service';
 import {
   SignupBody,
   signupBodySchema,
   SignupService,
 } from './services/signup.service';
 import { RequestRefreshToken } from './tokens-decorator';
-import { JwtAuthGuard } from './jwt-auth.guard';
-import { CurrentUser } from './current-user-decorator';
-import { UserModel } from '@/infra/database/prisma/generated/models';
-import { RefreshService } from './services/refresh.service';
-import { SignoutService } from './services/signout.service';
 
 @Controller('auth')
 export class AuthController {
@@ -35,12 +35,14 @@ export class AuthController {
   ) {}
 
   @Post('signup')
+  @Public()
   @UsePipes(new ZodValidationPipe(signupBodySchema))
   async signup(@Body() body: SignupBody) {
     return this.signupService.execute(body);
   }
 
   @Post('signin')
+  @Public()
   @UsePipes(new ZodValidationPipe(signinBodySchema))
   async signin(@Body() body: SigninBody) {
     return this.signinService.execute(body);
@@ -53,7 +55,6 @@ export class AuthController {
   }
 
   @Post('signout')
-  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   async signout(@CurrentUser() user: UserModel) {
     await this.signoutService.execute(user.id);

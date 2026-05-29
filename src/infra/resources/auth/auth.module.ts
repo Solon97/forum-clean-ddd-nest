@@ -2,9 +2,11 @@ import { BcryptHasher } from '@/infra/cryptography/bcrypt-hasher';
 import { DatabaseModule } from '@/infra/database/database.module';
 import { EnvConfigService } from '@/infra/env/env.service';
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
+import { JwtAuthGuard } from './jwt-auth.guard';
 import { JwtStrategy } from './jwt.strategy';
 import { RefreshService } from './services/refresh.service';
 import { SigninService } from './services/signin.service';
@@ -40,6 +42,10 @@ import { TokenService } from './services/tokens.service';
     SignoutService,
     TokenService,
     BcryptHasher,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
   ],
 })
 export class AuthModule {}

@@ -1,7 +1,6 @@
 import { UserModel } from '@/infra/database/prisma/generated/models';
 import { ZodValidationPipe } from '@/infra/pipes/zod-validation-pipe';
-import { JwtAuthGuard } from '@/infra/resources/auth/jwt-auth.guard';
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { CurrentUser } from '../auth/current-user-decorator';
 import {
   CreateQuestionBody,
@@ -15,7 +14,6 @@ import {
 } from './services/fetch-recent-questions.service';
 
 @Controller('questions')
-@UseGuards(JwtAuthGuard)
 export class QuestionController {
   constructor(
     private readonly createQuestionService: CreateQuestionService,
