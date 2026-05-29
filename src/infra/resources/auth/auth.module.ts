@@ -1,3 +1,5 @@
+import { BcryptHasher } from '@/infra/cryptography/bcrypt-hasher';
+import { DatabaseModule } from '@/infra/database/database.module';
 import { EnvConfigService } from '@/infra/env/env.service';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
@@ -7,7 +9,6 @@ import { JwtStrategy } from './jwt.strategy';
 import { SigninService } from './services/signin.service';
 import { SignupService } from './services/signup.service';
 import { TokenService } from './services/tokens.service';
-import { DatabaseModule } from '@/infra/database/database.module';
 
 @Module({
   imports: [
@@ -29,6 +30,12 @@ import { DatabaseModule } from '@/infra/database/database.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [JwtStrategy, SigninService, SignupService, TokenService],
+  providers: [
+    JwtStrategy,
+    SigninService,
+    SignupService,
+    TokenService,
+    BcryptHasher,
+  ],
 })
 export class AuthModule {}

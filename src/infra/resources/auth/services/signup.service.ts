@@ -1,6 +1,9 @@
-import { PrismaService } from '@/infra/database/prisma/prisma.service';
+import { UserAlreadyExistsError } from '@/domain/forum/use-cases/errors/user-already-exists-error';
+import { RegisterUserUseCase } from '@/domain/forum/use-cases/register-user';
+import { BcryptHasher } from '@/infra/cryptography/bcrypt-hasher';
+import { PrismaUserRepository } from '@/infra/database/prisma/repositories/prisma-user-repository';
 import { ConflictException, Injectable } from '@nestjs/common';
-import { genSalt, hash } from 'bcryptjs';
+import { isLeft } from 'fp-ts/lib/Either';
 import z from 'zod';
 
 export const signupBodySchema = z.object({
@@ -13,29 +16,22 @@ export type SignupBody = z.infer<typeof signupBodySchema>;
 
 @Injectable()
 export class SignupService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly userRepository: PrismaUserRepository,
+    private readonly hasher: BcryptHasher,
+  ) {}
 
   async execute(body: SignupBody) {
-    const { name, email, password } = body;
-    const existingUser = await this.prismaService.user.findUnique({
-      where: {
-        email,
-      },
-    });
-    if (existingUser) {
-      throw new ConflictException('User already exists');
+    const useCase = new RegisterUserUseCase(this.userRepository, this.hasher);
+    const result = await useCase.execute(body);
+
+    if (isLeft(result)) {
+      if (result.left instanceof UserAlreadyExistsError) {
+        throw new ConflictException(result.left.message);
+      }
+      throw new ConflictException('Signup failed');
     }
 
-    const salt = await genSalt(10);
-    const hashedPassword = await hash(password, salt);
-
-    const user = await this.prismaService.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-      },
-    });
-    return user;
+    return { id: result.right.user.id.toString() };
   }
 }

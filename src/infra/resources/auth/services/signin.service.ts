@@ -1,6 +1,8 @@
-import { PrismaService } from '@/infra/database/prisma/prisma.service';
+import { AuthenticateUserUseCase } from '@/domain/forum/use-cases/authenticate-user';
+import { BcryptHasher } from '@/infra/cryptography/bcrypt-hasher';
+import { PrismaUserRepository } from '@/infra/database/prisma/repositories/prisma-user-repository';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { compare } from 'bcryptjs';
+import { isLeft } from 'fp-ts/lib/Either';
 import { z } from 'zod';
 import { TokenService } from './tokens.service';
 
@@ -14,27 +16,23 @@ export type SigninBody = z.infer<typeof signinBodySchema>;
 @Injectable()
 export class SigninService {
   constructor(
-    private readonly prismaService: PrismaService,
+    private readonly userRepository: PrismaUserRepository,
+    private readonly hasher: BcryptHasher,
     private readonly tokenService: TokenService,
   ) {}
 
   async execute(body: SigninBody) {
-    const { email, password } = body;
+    const useCase = new AuthenticateUserUseCase(
+      this.userRepository,
+      this.hasher,
+      this.tokenService,
+    );
+    const result = await useCase.execute(body);
 
-    const existingUser = await this.prismaService.user.findUnique({
-      where: {
-        email,
-      },
-    });
-    if (!existingUser) {
-      throw new UnauthorizedException('User credentials are invalid');
+    if (isLeft(result)) {
+      throw new UnauthorizedException(result.left.message);
     }
 
-    const isPasswordValid = await compare(password, existingUser.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('User credentials are invalid');
-    }
-
-    return this.tokenService.generateTokens(existingUser.id);
+    return result.right;
   }
 }

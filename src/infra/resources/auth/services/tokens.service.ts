@@ -1,3 +1,4 @@
+import { TokenGenerator } from '@/domain/forum/gateways/token-generator';
 import { PrismaService } from '@/infra/database/prisma/prisma.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -6,7 +7,7 @@ import { createHash, randomBytes } from 'node:crypto';
 const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
 
 @Injectable()
-export class TokenService {
+export class TokenService implements TokenGenerator {
   constructor(
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
