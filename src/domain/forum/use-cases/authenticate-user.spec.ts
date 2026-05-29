@@ -14,6 +14,7 @@ import {
 } from '@test/helpers/assert-either';
 import { assertSpyCalled, assertSpyNotCalled } from '@test/helpers/spy-helpers';
 import { Mock } from 'vitest';
+import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id';
 
 class FakeHasher implements Hasher {
   async hash(value: string): Promise<string> {
@@ -26,10 +27,12 @@ class FakeHasher implements Hasher {
 }
 
 class FakeTokenGenerator implements TokenGenerator {
-  async generateTokens(userId: string): Promise<AuthenticateUserUseCaseOutput> {
+  async generateTokens(
+    userId: UniqueEntityId,
+  ): Promise<AuthenticateUserUseCaseOutput> {
     return Promise.resolve({
-      access_token: `access-${userId}`,
-      refresh_token: `refresh-${userId}`,
+      access_token: `access-${userId.toString()}`,
+      refresh_token: `refresh-${userId.toString()}`,
     });
   }
 }
@@ -63,7 +66,7 @@ describe('Authenticate User', () => {
     });
 
     assertEitherIsRight(result);
-    assertSpyCalled(tokenGeneratorSpy, user.id.toString());
+    assertSpyCalled(tokenGeneratorSpy, user.id);
     expect(result.right.access_token).toBe(`access-${user.id.toString()}`);
     expect(result.right.refresh_token).toBe(`refresh-${user.id.toString()}`);
   });

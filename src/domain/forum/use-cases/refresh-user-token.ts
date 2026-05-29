@@ -38,7 +38,7 @@ export class RefreshUserTokenUseCase {
     }
 
     const tokens = await this.tokenGenerator.generateTokens(
-      existingToken.userId.toString(),
+      existingToken.userId,
     );
 
     return right(tokens);

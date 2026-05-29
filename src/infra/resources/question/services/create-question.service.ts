@@ -1,6 +1,7 @@
 import { CreateQuestionUseCase } from '@/domain/forum/use-cases/create-question';
 import { PrismaQuestionRepository } from '@/infra/database/prisma/repositories/prisma-question-repository';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { handleUseCaseError } from '@/infra/shared/handle-use-case-error';
+import { Injectable } from '@nestjs/common';
 import { isLeft } from 'fp-ts/lib/Either';
 import z from 'zod';
 
@@ -26,7 +27,7 @@ export class CreateQuestionService {
     });
 
     if (isLeft(result)) {
-      throw new BadRequestException(result.left.message);
+      handleUseCaseError(result.left);
     }
 
     return { id: result.right.question.id.toString() };

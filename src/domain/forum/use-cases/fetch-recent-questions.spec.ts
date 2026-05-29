@@ -3,7 +3,6 @@ import { InMemoryQuestionRepository } from '@test/repositories/in-memory-questio
 import { Mock } from 'vitest';
 import { QuestionRepository } from '../repositories/question-repository';
 import { FetchRecentQuestionsUseCase } from './fetch-recent-questions';
-import { assertEitherIsRight } from '@test/helpers/assert-either';
 
 let inMemoryQuestionRepository: QuestionRepository;
 let sut: FetchRecentQuestionsUseCase;
@@ -18,8 +17,8 @@ describe('Fetch Recent Questions', () => {
 
   it('should be able to fetch recent questions', async () => {
     const result = await sut.execute({ paginationParams: { page: 1 } });
-
-    assertEitherIsRight(result);
+    expect(result).toBeDefined();
+    expect(result.questions).toBeInstanceOf(Array);
     assertSpyCalled(sutRepositorySpy, { page: 1 });
   });
 });

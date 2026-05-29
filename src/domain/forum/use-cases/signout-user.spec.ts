@@ -1,13 +1,8 @@
-import {
-  assertEitherIsLeft,
-  assertEitherIsRight,
-} from '@test/helpers/assert-either';
-import { InMemoryRefreshTokenRepository } from '@test/repositories/in-memory-refresh-token-repository';
 import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id';
-import { RefreshTokenRepository } from '../repositories/refresh-token-repository';
+import { InMemoryRefreshTokenRepository } from '@test/repositories/in-memory-refresh-token-repository';
 import { RefreshToken } from '../entities/refresh-token';
+import { RefreshTokenRepository } from '../repositories/refresh-token-repository';
 import { SignoutUserUseCase } from './signout-user';
-import { InvalidUniqueEntityIdError } from '@/shared/entities/value-objects/unique-entity-id';
 
 let refreshTokenRepository: RefreshTokenRepository;
 let sut: SignoutUserUseCase;
@@ -49,10 +44,7 @@ describe('Signout User', () => {
       }),
     );
 
-    const result = await sut.execute({ userId: userId.toString() });
-
-    assertEitherIsRight(result);
-    expect(result.right.success).toBe(true);
+    await sut.execute({ userId: userId.toString() });
 
     const userToken1 = await refreshTokenRepository.findByToken('token-1');
     const userToken2 = await refreshTokenRepository.findByToken('token-2');
@@ -61,12 +53,5 @@ describe('Signout User', () => {
     expect(userToken1?.revoked).toBe(true);
     expect(userToken2?.revoked).toBe(true);
     expect(otherUserToken?.revoked).toBe(false);
-  });
-
-  it('should return left when user id is invalid', async () => {
-    const result = await sut.execute({ userId: 'invalid-id' });
-
-    assertEitherIsLeft(result);
-    expect(result.left).toBeInstanceOf(InvalidUniqueEntityIdError);
   });
 });

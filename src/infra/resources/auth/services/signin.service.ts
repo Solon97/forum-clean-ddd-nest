@@ -5,6 +5,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { isLeft } from 'fp-ts/lib/Either';
 import { z } from 'zod';
 import { TokenService } from './tokens.service';
+import { handleUseCaseError } from '@/infra/shared/handle-use-case-error';
 
 export const signinBodySchema = z.object({
   email: z.email(),
@@ -30,7 +31,9 @@ export class SigninService {
     const result = await useCase.execute(body);
 
     if (isLeft(result)) {
-      throw new UnauthorizedException(result.left.message);
+      handleUseCaseError(result.left, {
+        WrongCredentialsError: UnauthorizedException,
+      });
     }
 
     return result.right;

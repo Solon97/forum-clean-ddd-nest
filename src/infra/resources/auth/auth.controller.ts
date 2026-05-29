@@ -1,5 +1,12 @@
 import { ZodValidationPipe } from '@/infra/pipes/zod-validation-pipe';
-import { Body, Controller, Post, UseGuards, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
 import { RefreshTokenGuard } from './refresh-auth.guard';
 import {
   SigninBody,
@@ -47,7 +54,8 @@ export class AuthController {
 
   @Post('signout')
   @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
   async signout(@CurrentUser() user: UserModel) {
-    return this.signoutService.execute(user.id);
+    await this.signoutService.execute(user.id);
   }
 }

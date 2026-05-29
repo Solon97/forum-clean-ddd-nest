@@ -1,7 +1,7 @@
-import { UserAlreadyExistsError } from '@/domain/forum/use-cases/errors/user-already-exists-error';
 import { RegisterUserUseCase } from '@/domain/forum/use-cases/register-user';
 import { BcryptHasher } from '@/infra/cryptography/bcrypt-hasher';
 import { PrismaUserRepository } from '@/infra/database/prisma/repositories/prisma-user-repository';
+import { handleUseCaseError } from '@/infra/shared/handle-use-case-error';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { isLeft } from 'fp-ts/lib/Either';
 import z from 'zod';
@@ -26,10 +26,9 @@ export class SignupService {
     const result = await useCase.execute(body);
 
     if (isLeft(result)) {
-      if (result.left instanceof UserAlreadyExistsError) {
-        throw new ConflictException(result.left.message);
-      }
-      throw new ConflictException('Signup failed');
+      handleUseCaseError(result.left, {
+        UserAlreadyExistsError: ConflictException,
+      });
     }
 
     return { id: result.right.user.id.toString() };

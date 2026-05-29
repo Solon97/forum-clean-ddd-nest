@@ -3,6 +3,7 @@ import { PrismaRefreshTokenRepository } from '@/infra/database/prisma/repositori
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { isLeft } from 'fp-ts/lib/Either';
 import { TokenService } from './tokens.service';
+import { handleUseCaseError } from '@/infra/shared/handle-use-case-error';
 
 @Injectable()
 export class RefreshService {
@@ -19,7 +20,9 @@ export class RefreshService {
 
     const result = await useCase.execute({ refreshToken });
     if (isLeft(result)) {
-      throw new UnauthorizedException(result.left.message);
+      handleUseCaseError(result.left, {
+        InvalidTokenError: UnauthorizedException,
+      });
     }
 
     return result.right;

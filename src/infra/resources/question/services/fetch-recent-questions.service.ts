@@ -1,7 +1,6 @@
 import { FetchRecentQuestionsUseCase } from '@/domain/forum/use-cases/fetch-recent-questions';
 import { PrismaQuestionRepository } from '@/infra/database/prisma/repositories/prisma-question-repository';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { isLeft } from 'fp-ts/lib/Either';
+import { Injectable } from '@nestjs/common';
 import z from 'zod';
 import { QuestionPresenter } from '../question-presenter';
 
@@ -27,14 +26,8 @@ export class FetchRecentQuestionsService {
       },
     });
 
-    if (isLeft(result)) {
-      throw new InternalServerErrorException(
-        'Failed to fetch recent questions',
-      );
-    }
-
     return {
-      questions: QuestionPresenter.toJSONList(result.right.questions),
+      questions: QuestionPresenter.toJSONList(result.questions),
     };
   }
 }

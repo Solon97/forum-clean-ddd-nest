@@ -36,7 +36,7 @@ export class AuthenticateUserUseCase {
     );
     if (!isPasswordValid) return left(new WrongCredentialsError());
 
-    const tokens = await this.tokenGenerator.generateTokens(user.id.toString());
+    const tokens = await this.tokenGenerator.generateTokens(user.id);
     return right(tokens);
   }
 }

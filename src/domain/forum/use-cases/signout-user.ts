@@ -1,16 +1,9 @@
-import {
-  InvalidUniqueEntityIdError,
-  UniqueEntityId,
-} from '@/shared/entities/value-objects/unique-entity-id';
-import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
+import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id';
+import { isLeft } from 'fp-ts/lib/Either';
 import { RefreshTokenRepository } from '../repositories/refresh-token-repository';
 
 export interface SignoutUserUseCaseInput {
   userId: string;
-}
-
-export interface SignoutUserUseCaseOutput {
-  success: boolean;
 }
 
 export class SignoutUserUseCase {
@@ -18,20 +11,14 @@ export class SignoutUserUseCase {
     private readonly refreshTokenRepository: RefreshTokenRepository,
   ) {}
 
-  async execute({
-    userId,
-  }: SignoutUserUseCaseInput): Promise<
-    Either<InvalidUniqueEntityIdError, SignoutUserUseCaseOutput>
-  > {
+  async execute({ userId }: SignoutUserUseCaseInput): Promise<void> {
     const userIdOrError = UniqueEntityId.createFromExistingId(userId);
     if (isLeft(userIdOrError)) {
-      return left(new InvalidUniqueEntityIdError('User'));
+      return;
     }
 
     await this.refreshTokenRepository.revokeManyByUserId(
       userIdOrError.right.toString(),
     );
-
-    return right({ success: true });
   }
 }
