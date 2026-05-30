@@ -2,7 +2,16 @@ import { PostgreSqlContainer } from '@testcontainers/postgresql';
 import { GenericContainer } from 'testcontainers';
 import { execSync } from 'node:child_process';
 
+const E2E_SETUP_FLAG = '__E2E_ENV_READY__';
+
 export default async function globalSetup() {
+  const setupState = globalThis as typeof globalThis &
+    Record<string, boolean | undefined>;
+
+  if (setupState[E2E_SETUP_FLAG]) {
+    return;
+  }
+
   const container = await new PostgreSqlContainer('postgres:16-alpine')
     .withDatabase('forum_test')
     .withUsername('test')
@@ -20,7 +29,6 @@ export default async function globalSetup() {
     })
     .withExposedPorts(4566)
     .start();
-
   process.env.DATABASE_URL = container.getConnectionUri();
   process.env.S3_REGION = 'us-east-1';
   process.env.S3_BUCKET = 'forum-attachments-test';
@@ -33,8 +41,11 @@ export default async function globalSetup() {
     env: process.env,
   });
 
+  setupState[E2E_SETUP_FLAG] = true;
+
   return async () => {
     await localStackContainer.stop();
     await container.stop();
+    setupState[E2E_SETUP_FLAG] = false;
   };
 }

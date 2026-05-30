@@ -9,13 +9,17 @@ const prisma = new PrismaClient({
 });
 
 beforeEach(async () => {
-  await prisma.refreshToken.deleteMany();
-  await prisma.notification.deleteMany();
-  await prisma.comment.deleteMany();
-  await prisma.attachment.deleteMany();
-  await prisma.answer.deleteMany();
-  await prisma.question.deleteMany();
-  await prisma.user.deleteMany();
+  await prisma.$executeRawUnsafe(`
+    TRUNCATE TABLE
+      refresh_tokens,
+      notifications,
+      comments,
+      attachments,
+      answers,
+      questions,
+      users
+    RESTART IDENTITY CASCADE
+  `);
 });
 
 afterAll(async () => {
