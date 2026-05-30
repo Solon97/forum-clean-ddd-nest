@@ -31,6 +31,13 @@ export default defineConfig({
           include: ['src/infra/resources/answer/__test__/**/*.e2e-spec.ts'],
         },
       },
+      {
+        extends: true,
+        test: {
+          name: 'attachment-e2e',
+          include: ['src/infra/resources/attachment/__test__/**/*.e2e-spec.ts'],
+        },
+      },
     ],
   },
   plugins: [

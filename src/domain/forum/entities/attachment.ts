@@ -1,31 +1,15 @@
-import { BaseEntity, Timestamps } from '@/shared/entities/base-entity';
-import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id';
+import { BaseEntity } from '@/shared/entities/base-entity';
 
 export interface AttachmentProps {
-  fileName: string;
-  fileUrl: string;
+  title: string;
+  url: string;
 }
-export class Attachment<T extends AttachmentProps> extends BaseEntity<
-  T & Timestamps
-> {
-  constructor(props: T & Partial<Timestamps>, id?: UniqueEntityId) {
-    const propsWithTimestamps = BaseEntity.setPropsTimestamps(props);
-    super(propsWithTimestamps, id);
+export class Attachment<T extends AttachmentProps> extends BaseEntity<T> {
+  get title() {
+    return this.props.title;
   }
 
-  get fileName() {
-    return this.props.fileName;
-  }
-
-  get fileUrl() {
-    return this.props.fileUrl;
-  }
-
-  get createdAt() {
-    return this.props.createdAt;
-  }
-
-  get updatedAt() {
-    return this.props.updatedAt;
+  get url() {
+    return this.props.url;
   }
 }

@@ -8,6 +8,7 @@ import { PrismaQuestionCommentRepository } from './repositories/prisma-question-
 import { PrismaQuestionRepository } from './repositories/prisma-question-repository';
 import { PrismaRefreshTokenRepository } from './repositories/prisma-refresh-token-repository';
 import { PrismaUserRepository } from './repositories/prisma-user-repository';
+import { PrismaAttachmentRepository } from './repositories/prisma-attachment-repository';
 
 @Module({
   providers: [
@@ -20,6 +21,7 @@ import { PrismaUserRepository } from './repositories/prisma-user-repository';
     PrismaQuestionRepository,
     PrismaUserRepository,
     PrismaRefreshTokenRepository,
+    PrismaAttachmentRepository,
   ],
   exports: [
     PrismaService,
@@ -31,6 +33,7 @@ import { PrismaUserRepository } from './repositories/prisma-user-repository';
     PrismaQuestionRepository,
     PrismaUserRepository,
     PrismaRefreshTokenRepository,
+    PrismaAttachmentRepository,
   ],
 })
 export class PrismaModule {}
