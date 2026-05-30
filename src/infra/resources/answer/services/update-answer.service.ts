@@ -1,4 +1,5 @@
 import { UpdateAnswerUseCase } from '@/domain/forum/use-cases/update-answer';
+import { PrismaAttachmentRepository } from '@/infra/database/prisma/repositories/prisma-attachment-repository';
 import { PrismaAnswerAttachmentsRepository } from '@/infra/database/prisma/repositories/prisma-answer-attachments-repository';
 import { PrismaAnswerRepository } from '@/infra/database/prisma/repositories/prisma-answer-repository';
 import { handleUseCaseError } from '@/infra/shared/handle-use-case-error';
@@ -23,6 +24,7 @@ export class UpdateAnswerService {
   constructor(
     private readonly answerRepository: PrismaAnswerRepository,
     private readonly answerAttachmentsRepository: PrismaAnswerAttachmentsRepository,
+    private readonly attachmentRepository: PrismaAttachmentRepository,
   ) {}
 
   async execute(
@@ -33,6 +35,7 @@ export class UpdateAnswerService {
     const useCase = new UpdateAnswerUseCase(
       this.answerRepository,
       this.answerAttachmentsRepository,
+      this.attachmentRepository,
     );
 
     const result = await useCase.execute({

@@ -27,6 +27,8 @@ export class PrismaAnswerRepository implements AnswerRepository {
             id: {
               in: attachmentIds,
             },
+            answerId: null,
+            questionId: null,
           },
           data: {
             answerId: data.id,
@@ -61,6 +63,8 @@ export class PrismaAnswerRepository implements AnswerRepository {
             id: {
               in: newAttachmentIds,
             },
+            questionId: null,
+            OR: [{ answerId: null }, { answerId: data.id }],
           },
           data: {
             answerId: data.id,
@@ -130,10 +134,21 @@ export class PrismaAnswerRepository implements AnswerRepository {
 
   async delete(answer: Answer): Promise<void> {
     const data = PrismaAnswerMapper.toPrisma(answer);
-    await this.prismaService.answer.delete({
-      where: {
-        id: data.id,
-      },
+    await this.prismaService.$transaction(async (tx) => {
+      await tx.attachment.updateMany({
+        where: {
+          answerId: data.id,
+        },
+        data: {
+          answerId: null,
+        },
+      });
+
+      await tx.answer.delete({
+        where: {
+          id: data.id,
+        },
+      });
     });
   }
 }

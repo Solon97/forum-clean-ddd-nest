@@ -1,4 +1,5 @@
 import { AnswerQuestionUseCase } from '@/domain/forum/use-cases/answer-question';
+import { PrismaAttachmentRepository } from '@/infra/database/prisma/repositories/prisma-attachment-repository';
 import { PrismaAnswerRepository } from '@/infra/database/prisma/repositories/prisma-answer-repository';
 import { handleUseCaseError } from '@/infra/shared/handle-use-case-error';
 import { Injectable } from '@nestjs/common';
@@ -20,14 +21,20 @@ export type AnswerQuestionBody = z.infer<typeof answerQuestionBodySchema>;
 
 @Injectable()
 export class AnswerQuestionService {
-  constructor(private readonly answerRepository: PrismaAnswerRepository) {}
+  constructor(
+    private readonly answerRepository: PrismaAnswerRepository,
+    private readonly attachmentRepository: PrismaAttachmentRepository,
+  ) {}
 
   async execute(
     data: AnswerQuestionBody,
     authorId: string,
     questionId: AnswerQuestionQuestionIdParam,
   ) {
-    const useCase = new AnswerQuestionUseCase(this.answerRepository);
+    const useCase = new AnswerQuestionUseCase(
+      this.answerRepository,
+      this.attachmentRepository,
+    );
     const result = await useCase.execute({
       questionId,
       authorId,

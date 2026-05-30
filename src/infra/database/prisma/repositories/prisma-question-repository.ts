@@ -12,8 +12,29 @@ export class PrismaQuestionRepository implements QuestionRepository {
 
   async create(question: Question): Promise<void> {
     const data = PrismaQuestionMapper.toPrisma(question);
-    await this.prismaService.question.create({
-      data,
+    const attachmentIds = question.attachments.currentItems.map((attachment) =>
+      attachment.attachmentId.toString(),
+    );
+
+    await this.prismaService.$transaction(async (tx) => {
+      await tx.question.create({
+        data,
+      });
+
+      if (attachmentIds.length > 0) {
+        await tx.attachment.updateMany({
+          where: {
+            id: {
+              in: attachmentIds,
+            },
+            questionId: null,
+            answerId: null,
+          },
+          data: {
+            questionId: data.id,
+          },
+        });
+      }
     });
   }
 
@@ -42,6 +63,8 @@ export class PrismaQuestionRepository implements QuestionRepository {
             id: {
               in: newAttachmentIds,
             },
+            answerId: null,
+            OR: [{ questionId: null }, { questionId: data.id }],
           },
           data: {
             questionId: data.id,
@@ -124,10 +147,21 @@ export class PrismaQuestionRepository implements QuestionRepository {
 
   async delete(question: Question): Promise<void> {
     const data = PrismaQuestionMapper.toPrisma(question);
-    await this.prismaService.question.delete({
-      where: {
-        id: data.id,
-      },
+    await this.prismaService.$transaction(async (tx) => {
+      await tx.attachment.updateMany({
+        where: {
+          questionId: data.id,
+        },
+        data: {
+          questionId: null,
+        },
+      });
+
+      await tx.question.delete({
+        where: {
+          id: data.id,
+        },
+      });
     });
   }
 }

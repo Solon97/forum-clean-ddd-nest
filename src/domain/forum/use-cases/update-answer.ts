@@ -9,6 +9,8 @@ import {
   UniqueEntityId,
 } from '@/shared/entities/value-objects/unique-entity-id';
 import { Answer } from '../entities/answer';
+import { AttachmentRepository } from '../repositories/attachment-repository';
+import { NotAllowedError } from '@/shared/errors/not-allowed';
 
 export interface UpdateAnswerUseCaseInput {
   authorId: string;
@@ -25,6 +27,7 @@ export class UpdateAnswerUseCase {
   constructor(
     private answerRepository: AnswerRepository,
     private answerAttachmentsRepository: AnswerAttachmentsRepository,
+    private attachmentRepository: AttachmentRepository,
   ) {}
 
   async execute({
@@ -34,7 +37,7 @@ export class UpdateAnswerUseCase {
     attachmentIds,
   }: UpdateAnswerUseCaseInput): Promise<
     Either<
-      ResourceNotFoundError | InvalidUniqueEntityIdError,
+      ResourceNotFoundError | InvalidUniqueEntityIdError | NotAllowedError,
       UpdateAnswerUseCaseOutput
     >
   > {
@@ -47,13 +50,49 @@ export class UpdateAnswerUseCase {
       await this.answerAttachmentsRepository.findManyByAnswerId(answerId);
     const answerAttachmentList = new AnswerAttachmentList(existingAttachments);
 
-    const newAnswerAttachments: AnswerAttachment[] = [];
+    const validAttachmentIds: string[] = [];
+    const attachmentIdsSet = new Set<string>();
+
     for (const attachmentId of attachmentIds) {
       const attachmentIdOrError =
         UniqueEntityId.createFromExistingId(attachmentId);
+
       if (isLeft(attachmentIdOrError)) {
         return left(new InvalidUniqueEntityIdError('Attachment'));
       }
+
+      const validAttachmentId = attachmentIdOrError.right.toString();
+      if (!attachmentIdsSet.has(validAttachmentId)) {
+        attachmentIdsSet.add(validAttachmentId);
+        validAttachmentIds.push(validAttachmentId);
+      }
+    }
+
+    const attachmentsAvailabilityStatus =
+      await this.attachmentRepository.findManyAvailabilityStatusByIds(
+        validAttachmentIds,
+      );
+
+    const newAnswerAttachments: AnswerAttachment[] = [];
+    for (const attachmentStatus of attachmentsAvailabilityStatus) {
+      const isLinkedToCurrentAnswer =
+        attachmentStatus.answerId === answer.id.toString();
+      const hasExternalAnswerLink =
+        attachmentStatus.answerId && !isLinkedToCurrentAnswer;
+      const isLinkedToQuestion = Boolean(attachmentStatus.questionId);
+
+      if (hasExternalAnswerLink || isLinkedToQuestion) {
+        return left(new NotAllowedError());
+      }
+
+      const attachmentIdOrError = UniqueEntityId.createFromExistingId(
+        attachmentStatus.id,
+      );
+
+      if (isLeft(attachmentIdOrError)) {
+        return left(new InvalidUniqueEntityIdError('Attachment'));
+      }
+
       newAnswerAttachments.push(
         new AnswerAttachment({
           answerId: answer.id,

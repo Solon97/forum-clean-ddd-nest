@@ -5,17 +5,22 @@ import {
   assertEitherIsRight,
 } from '@test/helpers/assert-either';
 import { assertSpyCalled, assertSpyNotCalled } from '@test/helpers/spy-helpers';
+import { InMemoryAttachmentRepository } from '@test/repositories/in-memory-attachment-repository';
 import { InMemoryAnswerAttachmentsRepository } from '@test/repositories/in-memory-answer-attachment-repository';
 import { InMemoryAnswerRepository } from '@test/repositories/in-memory-answer-repository';
 import { Mock } from 'vitest';
+import { Attachment } from '../entities/attachment';
 import { AnswerAttachment } from '../entities/answer-attachment';
+import { AttachmentRepository } from '../repositories/attachment-repository';
 import { AnswerAttachmentsRepository } from '../repositories/answer-attachments-repository';
 import { AnswerRepository } from '../repositories/answer-repository';
 import { ResourceNotFoundError } from '../../../shared/errors/resource-not-found';
+import { NotAllowedError } from '@/shared/errors/not-allowed';
 import { UpdateAnswerUseCase } from './update-answer';
 
 let inMemoryAnswerRepository: AnswerRepository;
 let inMemoryAnswerAttachmentsRepository: AnswerAttachmentsRepository;
+let inMemoryAttachmentRepository: AttachmentRepository;
 let sut: UpdateAnswerUseCase;
 let sutRepositorySpy: Mock<typeof inMemoryAnswerRepository.update>;
 
@@ -24,9 +29,11 @@ describe('Update Answer', () => {
     inMemoryAnswerRepository = new InMemoryAnswerRepository();
     inMemoryAnswerAttachmentsRepository =
       new InMemoryAnswerAttachmentsRepository();
+    inMemoryAttachmentRepository = new InMemoryAttachmentRepository();
     sut = new UpdateAnswerUseCase(
       inMemoryAnswerRepository,
       inMemoryAnswerAttachmentsRepository,
+      inMemoryAttachmentRepository,
     );
     sutRepositorySpy = vi.spyOn(inMemoryAnswerRepository, 'update');
   });
@@ -62,17 +69,54 @@ describe('Update Answer', () => {
   it('should be able to update a answer with attachments', async () => {
     const exampleAnswer = makeAnswer();
     await inMemoryAnswerRepository.create(exampleAnswer);
+
+    const existingAttachmentId = UniqueEntityId.create();
+    const removedAttachmentId = UniqueEntityId.create();
+    const newAttachmentId = UniqueEntityId.create();
+
+    await inMemoryAttachmentRepository.create(
+      new Attachment(
+        {
+          title: 'existing',
+          url: 'https://example.com/existing.png',
+          answerId: exampleAnswer.id,
+        },
+        existingAttachmentId,
+      ),
+    );
+
+    await inMemoryAttachmentRepository.create(
+      new Attachment(
+        {
+          title: 'removed',
+          url: 'https://example.com/removed.png',
+          answerId: exampleAnswer.id,
+        },
+        removedAttachmentId,
+      ),
+    );
+
+    await inMemoryAttachmentRepository.create(
+      new Attachment(
+        {
+          title: 'new',
+          url: 'https://example.com/new.png',
+        },
+        newAttachmentId,
+      ),
+    );
+
     const existingAttachment = new AnswerAttachment({
       answerId: exampleAnswer.id,
-      attachmentId: UniqueEntityId.create(),
+      attachmentId: existingAttachmentId,
     });
     const removedAttachment = new AnswerAttachment({
       answerId: exampleAnswer.id,
-      attachmentId: UniqueEntityId.create(),
+      attachmentId: removedAttachmentId,
     });
     const newAttachment = new AnswerAttachment({
       answerId: exampleAnswer.id,
-      attachmentId: UniqueEntityId.create(),
+      attachmentId: newAttachmentId,
     });
 
     inMemoryAnswerAttachmentsRepository.items.push(
@@ -134,6 +178,49 @@ describe('Update Answer', () => {
     });
     assertEitherIsLeft(result);
     expect(result.left).toBeInstanceOf(ResourceNotFoundError);
+    assertSpyNotCalled(sutRepositorySpy);
+  });
+
+  it('should ignore non-existing attachment ids on update', async () => {
+    const exampleAnswer = makeAnswer();
+    await inMemoryAnswerRepository.create(exampleAnswer);
+
+    const result = await sut.execute({
+      answerId: exampleAnswer.id.toString(),
+      authorId: exampleAnswer.authorId.toString(),
+      content: 'Updated Content',
+      attachmentIds: [UniqueEntityId.create().toString()],
+    });
+
+    assertEitherIsRight(result);
+    expect(result.right.answer.attachments.currentItems).toHaveLength(0);
+  });
+
+  it('should not update an answer with attachment linked to another aggregate', async () => {
+    const exampleAnswer = makeAnswer();
+    await inMemoryAnswerRepository.create(exampleAnswer);
+
+    const linkedAttachmentId = UniqueEntityId.create();
+    await inMemoryAttachmentRepository.create(
+      new Attachment(
+        {
+          title: 'linked',
+          url: 'https://example.com/linked.png',
+          answerId: UniqueEntityId.create(),
+        },
+        linkedAttachmentId,
+      ),
+    );
+
+    const result = await sut.execute({
+      answerId: exampleAnswer.id.toString(),
+      authorId: exampleAnswer.authorId.toString(),
+      content: 'Updated Content',
+      attachmentIds: [linkedAttachmentId.toString()],
+    });
+
+    assertEitherIsLeft(result);
+    expect(result.left).toBeInstanceOf(NotAllowedError);
     assertSpyNotCalled(sutRepositorySpy);
   });
 });

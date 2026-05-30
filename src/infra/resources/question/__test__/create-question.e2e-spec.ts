@@ -51,6 +51,46 @@ describe('Create Question E2E Test', () => {
     expect(question?.content).toBe('This is a test question');
   });
 
+  test('[POST] /questions - should create a new question and bind attachments', async () => {
+    const { accessToken, userId } = await authenticateUserE2ETest(app);
+
+    const attachment = await prismaService.attachment.create({
+      data: {
+        title: 'Question attachment',
+        url: 'https://example.com/question-attachment.png',
+      },
+    });
+
+    const response = await request(app.getHttpServer())
+      .post('/questions')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        title: 'Test Question with attachment',
+        content: 'This is a test question with attachment',
+        attachmentIds: [attachment.id],
+      });
+
+    expect(response.status).toBe(201);
+
+    const responseBody = response.body as { id: string };
+    const question = await prismaService.question.findFirst({
+      where: {
+        id: responseBody.id,
+        authorId: userId,
+      },
+    });
+
+    expect(question).not.toBeNull();
+
+    const persistedAttachment = await prismaService.attachment.findUnique({
+      where: {
+        id: attachment.id,
+      },
+    });
+
+    expect(persistedAttachment?.questionId).toBe(question?.id);
+  });
+
   test('[POST] /questions - should return 400 if data is invalid', async () => {
     const { accessToken } = await authenticateUserE2ETest(app);
 

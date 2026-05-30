@@ -1,22 +1,34 @@
 import { Mock } from 'vitest';
 import { InMemoryQuestionRepository } from '@test/repositories/in-memory-question-repository';
+import { InMemoryAttachmentRepository } from '@test/repositories/in-memory-attachment-repository';
 import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id';
 import { QuestionRepository } from '../repositories/question-repository';
+import { AttachmentRepository } from '../repositories/attachment-repository';
 import {
   CreateQuestionUseCase,
   CreateQuestionUseCaseInput,
 } from './create-question';
 import { assertSpyCalled } from '@test/helpers/spy-helpers';
-import { assertEitherIsRight } from '@test/helpers/assert-either';
+import {
+  assertEitherIsLeft,
+  assertEitherIsRight,
+} from '@test/helpers/assert-either';
+import { Attachment } from '../entities/attachment';
+import { NotAllowedError } from '@/shared/errors/not-allowed';
 
 let inMemoryQuestionRepository: QuestionRepository;
+let inMemoryAttachmentRepository: AttachmentRepository;
 let sut: CreateQuestionUseCase;
 let sutRepositorySpy: Mock<typeof inMemoryQuestionRepository.create>;
 
 describe('Create Question', () => {
   beforeEach(() => {
     inMemoryQuestionRepository = new InMemoryQuestionRepository();
-    sut = new CreateQuestionUseCase(inMemoryQuestionRepository);
+    inMemoryAttachmentRepository = new InMemoryAttachmentRepository();
+    sut = new CreateQuestionUseCase(
+      inMemoryQuestionRepository,
+      inMemoryAttachmentRepository,
+    );
     sutRepositorySpy = vi.spyOn(inMemoryQuestionRepository, 'create');
   });
 
@@ -44,12 +56,23 @@ describe('Create Question', () => {
   });
 
   it('should create a question with attachments', async () => {
+    const attachmentId = UniqueEntityId.create();
+    await inMemoryAttachmentRepository.create(
+      new Attachment(
+        {
+          title: 'attachment',
+          url: 'https://example.com/attachment.png',
+        },
+        attachmentId,
+      ),
+    );
+
     const input: CreateQuestionUseCaseInput = {
       authorId: UniqueEntityId.create().toString(),
       title: 'How to implement DDD in a forum application?',
       content:
         'I want to learn how to implement DDD in a forum application. Any tips?',
-      attachmentIds: [UniqueEntityId.create().toString()],
+      attachmentIds: [attachmentId.toString()],
     };
 
     const result = await sut.execute(input);
@@ -61,5 +84,47 @@ describe('Create Question', () => {
     expect(
       result.right.question.attachments.currentItems[0]?.attachmentId.toString(),
     ).toBe(input.attachmentIds[0]);
+  });
+
+  it('should ignore non-existing attachment ids', async () => {
+    const input: CreateQuestionUseCaseInput = {
+      authorId: UniqueEntityId.create().toString(),
+      title: 'How to implement DDD in a forum application?',
+      content:
+        'I want to learn how to implement DDD in a forum application. Any tips?',
+      attachmentIds: [UniqueEntityId.create().toString()],
+    };
+
+    const result = await sut.execute(input);
+
+    assertEitherIsRight(result);
+    expect(result.right.question.attachments.currentItems).toHaveLength(0);
+  });
+
+  it('should not create a question when attachment is already linked', async () => {
+    const attachmentId = UniqueEntityId.create();
+    await inMemoryAttachmentRepository.create(
+      new Attachment(
+        {
+          title: 'attachment',
+          url: 'https://example.com/attachment.png',
+          questionId: UniqueEntityId.create(),
+        },
+        attachmentId,
+      ),
+    );
+
+    const input: CreateQuestionUseCaseInput = {
+      authorId: UniqueEntityId.create().toString(),
+      title: 'How to implement DDD in a forum application?',
+      content:
+        'I want to learn how to implement DDD in a forum application. Any tips?',
+      attachmentIds: [attachmentId.toString()],
+    };
+
+    const result = await sut.execute(input);
+
+    assertEitherIsLeft(result);
+    expect(result.left).toBeInstanceOf(NotAllowedError);
   });
 });

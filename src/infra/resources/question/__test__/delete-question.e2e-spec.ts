@@ -78,6 +78,41 @@ describe('Delete Question E2E Test', () => {
     expect(deletedQuestion).toBeNull();
   });
 
+  test('[DELETE] /questions/:id - should null questionId on related attachments', async () => {
+    const { accessToken, userId } = await authenticateUserE2ETest(app);
+
+    const question = await prismaService.question.create({
+      data: {
+        title: 'Question with attachment to delete',
+        content: 'Delete content',
+        slug: 'question-with-attachment-to-delete',
+        authorId: userId,
+      },
+    });
+
+    const attachment = await prismaService.attachment.create({
+      data: {
+        title: 'Question attachment',
+        url: 'https://example.com/question-attachment.png',
+        questionId: question.id,
+      },
+    });
+
+    const response = await request(app.getHttpServer())
+      .delete(`/questions/${question.id}`)
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    expect(response.status).toBe(200);
+
+    const persistedAttachment = await prismaService.attachment.findUnique({
+      where: {
+        id: attachment.id,
+      },
+    });
+
+    expect(persistedAttachment?.questionId).toBeNull();
+  });
+
   test('[DELETE] /questions/:id - should return 404 for non-existing question', async () => {
     const { accessToken } = await authenticateUserE2ETest(app);
 

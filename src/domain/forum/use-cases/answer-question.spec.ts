@@ -1,22 +1,34 @@
 import type { AnswerRepository } from '@/domain/forum/repositories/answer-repository';
 import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id';
-import { assertEitherIsRight } from '@test/helpers/assert-either';
+import {
+  assertEitherIsLeft,
+  assertEitherIsRight,
+} from '@test/helpers/assert-either';
 import { assertSpyCalled } from '@test/helpers/spy-helpers';
+import { InMemoryAttachmentRepository } from '@test/repositories/in-memory-attachment-repository';
 import { InMemoryAnswerRepository } from '@test/repositories/in-memory-answer-repository';
 import { Mock } from 'vitest';
+import { Attachment } from '../entities/attachment';
+import type { AttachmentRepository } from '../repositories/attachment-repository';
+import { NotAllowedError } from '@/shared/errors/not-allowed';
 import {
   AnswerQuestionUseCase,
   AnswerQuestionUseCaseInput,
 } from './answer-question';
 
 let inMemoryAnswerRepository: AnswerRepository;
+let inMemoryAttachmentRepository: AttachmentRepository;
 let answerQuestionUseCase: AnswerQuestionUseCase;
 let sutRepositorySpy: Mock<typeof inMemoryAnswerRepository.create>;
 
 describe('Create Answer', () => {
   beforeEach(() => {
     inMemoryAnswerRepository = new InMemoryAnswerRepository();
-    answerQuestionUseCase = new AnswerQuestionUseCase(inMemoryAnswerRepository);
+    inMemoryAttachmentRepository = new InMemoryAttachmentRepository();
+    answerQuestionUseCase = new AnswerQuestionUseCase(
+      inMemoryAnswerRepository,
+      inMemoryAttachmentRepository,
+    );
     sutRepositorySpy = vi.spyOn(inMemoryAnswerRepository, 'create');
   });
 
@@ -43,6 +55,29 @@ describe('Create Answer', () => {
   });
 
   test('should be able to create an answer with attachments', async () => {
+    const firstAttachmentId = UniqueEntityId.create();
+    const secondAttachmentId = UniqueEntityId.create();
+
+    await inMemoryAttachmentRepository.create(
+      new Attachment(
+        {
+          title: 'first',
+          url: 'https://example.com/first.png',
+        },
+        firstAttachmentId,
+      ),
+    );
+
+    await inMemoryAttachmentRepository.create(
+      new Attachment(
+        {
+          title: 'second',
+          url: 'https://example.com/second.png',
+        },
+        secondAttachmentId,
+      ),
+    );
+
     const questionId = UniqueEntityId.create().toString();
     const authorId = UniqueEntityId.create().toString();
     const input: AnswerQuestionUseCaseInput = {
@@ -50,8 +85,8 @@ describe('Create Answer', () => {
       authorId,
       content: 'This is an answer to the question.',
       attachmentIds: [
-        UniqueEntityId.create().toString(),
-        UniqueEntityId.create().toString(),
+        firstAttachmentId.toString(),
+        secondAttachmentId.toString(),
       ],
     };
 
@@ -67,5 +102,45 @@ describe('Create Answer', () => {
     expect(
       result.right.answer.attachments.currentItems[1]?.attachmentId.toString(),
     ).toBe(input.attachmentIds[1]);
+  });
+
+  test('should ignore non-existing attachment ids', async () => {
+    const questionId = UniqueEntityId.create().toString();
+    const authorId = UniqueEntityId.create().toString();
+    const input: AnswerQuestionUseCaseInput = {
+      questionId,
+      authorId,
+      content: 'This is an answer to the question.',
+      attachmentIds: [UniqueEntityId.create().toString()],
+    };
+
+    const result = await answerQuestionUseCase.execute(input);
+
+    assertEitherIsRight(result);
+    expect(result.right.answer.attachments.currentItems).toHaveLength(0);
+  });
+
+  test('should not create an answer when attachment is already linked', async () => {
+    const linkedAttachmentId = UniqueEntityId.create();
+    await inMemoryAttachmentRepository.create(
+      new Attachment(
+        {
+          title: 'linked',
+          url: 'https://example.com/linked.png',
+          answerId: UniqueEntityId.create(),
+        },
+        linkedAttachmentId,
+      ),
+    );
+
+    const result = await answerQuestionUseCase.execute({
+      questionId: UniqueEntityId.create().toString(),
+      authorId: UniqueEntityId.create().toString(),
+      content: 'This is an answer to the question.',
+      attachmentIds: [linkedAttachmentId.toString()],
+    });
+
+    assertEitherIsLeft(result);
+    expect(result.left).toBeInstanceOf(NotAllowedError);
   });
 });

@@ -6,6 +6,7 @@ import { makeQuestion } from '@test/factories/make-question';
 import { assertEitherIsRight } from '@test/helpers/assert-either';
 import { assertSpyCalled } from '@test/helpers/spy-helpers';
 import { InMemoryAnswerRepository } from '@test/repositories/in-memory-answer-repository';
+import { InMemoryAttachmentRepository } from '@test/repositories/in-memory-attachment-repository';
 import { InMemoryNotificationRepository } from '@test/repositories/in-memory-notification-repository';
 import { InMemoryQuestionRepository } from '@test/repositories/in-memory-question-repository';
 import { Mock } from 'vitest';
@@ -16,6 +17,7 @@ import { AnswerCreatedListener } from './answer-created-listener';
 let inMemoryQuestionRepository: QuestionRepository;
 let inMemoryNotificationRepository: NotificationRepository;
 let inMemoryAnswerRepository: AnswerRepository;
+let inMemoryAttachmentRepository: InMemoryAttachmentRepository;
 let sendNotificationUseCase: SendNotificationUseCase;
 let answerQuestionUseCase: AnswerQuestionUseCase;
 let sendNotificationExecuteSpy: Mock<typeof sendNotificationUseCase.execute>;
@@ -25,10 +27,14 @@ describe('AnswerCreatedListener', () => {
     inMemoryQuestionRepository = new InMemoryQuestionRepository();
     inMemoryNotificationRepository = new InMemoryNotificationRepository();
     inMemoryAnswerRepository = new InMemoryAnswerRepository();
+    inMemoryAttachmentRepository = new InMemoryAttachmentRepository();
     sendNotificationUseCase = new SendNotificationUseCase(
       inMemoryNotificationRepository,
     );
-    answerQuestionUseCase = new AnswerQuestionUseCase(inMemoryAnswerRepository);
+    answerQuestionUseCase = new AnswerQuestionUseCase(
+      inMemoryAnswerRepository,
+      inMemoryAttachmentRepository,
+    );
     new AnswerCreatedListener(
       inMemoryQuestionRepository,
       sendNotificationUseCase,

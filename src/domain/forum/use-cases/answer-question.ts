@@ -8,6 +8,8 @@ import { AnswerAttachment } from '../entities/answer-attachment';
 import { AnswerAttachmentList } from '../entities/answer-attachment-list';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { DomainEvents } from '@/shared/events/domain-events';
+import { AttachmentRepository } from '../repositories/attachment-repository';
+import { NotAllowedError } from '@/shared/errors/not-allowed';
 
 export interface AnswerQuestionUseCaseInput {
   questionId: string;
@@ -21,7 +23,10 @@ export interface AnswerQuestionUseCaseOutput {
 }
 
 export class AnswerQuestionUseCase {
-  constructor(private answerRepository: AnswerRepository) {}
+  constructor(
+    private answerRepository: AnswerRepository,
+    private attachmentRepository: AttachmentRepository,
+  ) {}
 
   async execute({
     questionId,
@@ -29,7 +34,10 @@ export class AnswerQuestionUseCase {
     content,
     attachmentIds,
   }: AnswerQuestionUseCaseInput): Promise<
-    Either<InvalidUniqueEntityIdError, AnswerQuestionUseCaseOutput>
+    Either<
+      InvalidUniqueEntityIdError | NotAllowedError,
+      AnswerQuestionUseCaseOutput
+    >
   > {
     const questionIdOrError = UniqueEntityId.createFromExistingId(questionId);
     const authorIdOrError = UniqueEntityId.createFromExistingId(authorId);
@@ -48,10 +56,38 @@ export class AnswerQuestionUseCase {
       authorId: authorIdOrError.right,
     });
 
-    const answerAttachments: AnswerAttachment[] = [];
-    attachmentIds.forEach((attachmentId) => {
+    const validAttachmentIds: string[] = [];
+    const attachmentIdsSet = new Set<string>();
+
+    for (const attachmentId of attachmentIds) {
       const attachmentIdOrError =
         UniqueEntityId.createFromExistingId(attachmentId);
+
+      if (isLeft(attachmentIdOrError)) {
+        return left(new InvalidUniqueEntityIdError('Attachment'));
+      }
+
+      const validAttachmentId = attachmentIdOrError.right.toString();
+      if (!attachmentIdsSet.has(validAttachmentId)) {
+        attachmentIdsSet.add(validAttachmentId);
+        validAttachmentIds.push(validAttachmentId);
+      }
+    }
+
+    const attachmentsAvailabilityStatus =
+      await this.attachmentRepository.findManyAvailabilityStatusByIds(
+        validAttachmentIds,
+      );
+
+    const answerAttachments: AnswerAttachment[] = [];
+    for (const attachmentStatus of attachmentsAvailabilityStatus) {
+      if (attachmentStatus.questionId || attachmentStatus.answerId) {
+        return left(new NotAllowedError());
+      }
+
+      const attachmentIdOrError = UniqueEntityId.createFromExistingId(
+        attachmentStatus.id,
+      );
 
       if (isLeft(attachmentIdOrError)) {
         return left(new InvalidUniqueEntityIdError('Attachment'));
@@ -63,7 +99,7 @@ export class AnswerQuestionUseCase {
           attachmentId: attachmentIdOrError.right,
         }),
       );
-    });
+    }
 
     answer.attachments = new AnswerAttachmentList(answerAttachments);
 
