@@ -4,7 +4,7 @@ import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id
 import { Optional } from '@/shared/types/optional';
 import { QuestionAttachmentList } from './question-attachment-list';
 import { Slug } from './value-objects/slug/index';
-import { SetQuestionBestAnswerEvent } from './events/set-question-best-answer-event';
+import { QuestionBestAnswerDefinedEvent } from './events/question-best-answer-defined';
 
 export interface QuestionProps {
   authorId: UniqueEntityId;
@@ -95,7 +95,9 @@ export class Question extends AggregateRoot<QuestionProps & Timestamps> {
       (!this.props.bestAnswerId ||
         !bestAnswerId.equals(this.props.bestAnswerId))
     ) {
-      this.addDomainEvent(new SetQuestionBestAnswerEvent(this, bestAnswerId));
+      this.addDomainEvent(
+        new QuestionBestAnswerDefinedEvent(this, bestAnswerId),
+      );
     }
     this.props.bestAnswerId = bestAnswerId;
     this.touch();

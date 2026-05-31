@@ -11,7 +11,7 @@ import { InMemoryQuestionRepository } from '@test/repositories/in-memory-questio
 import { Mock } from 'vitest';
 import { NotificationRepository } from '../repositories/notification-repository';
 import { SendNotificationUseCase } from '../use-cases/send-notification';
-import { QuestionBestAnswerSettedListener } from './question-best-answer-setted-listener';
+import { QuestionBestAnswerDefinedListener } from './question-best-answer-defined-listener';
 
 let inMemoryQuestionRepository: QuestionRepository;
 let inMemoryNotificationRepository: NotificationRepository;
@@ -32,7 +32,7 @@ describe('Question Best Answer Setted Listener', () => {
       inMemoryAnswerRepository,
       inMemoryQuestionRepository,
     );
-    new QuestionBestAnswerSettedListener(
+    new QuestionBestAnswerDefinedListener(
       inMemoryAnswerRepository,
       sendNotificationUseCase,
     );

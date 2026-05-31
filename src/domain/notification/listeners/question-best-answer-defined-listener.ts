@@ -2,9 +2,9 @@ import { AnswerRepository } from '@/domain/forum/repositories/answer-repository'
 import { EventHandler } from '@/shared/events/event-handler';
 import { SendNotificationUseCase } from '../use-cases/send-notification';
 import { DomainEvents } from '@/shared/events/domain-events';
-import { SetQuestionBestAnswerEvent } from '@/domain/forum/entities/events/set-question-best-answer-event';
+import { QuestionBestAnswerDefinedEvent } from '@/domain/forum/entities/events/question-best-answer-defined';
 
-export class QuestionBestAnswerSettedListener implements EventHandler {
+export class QuestionBestAnswerDefinedListener implements EventHandler {
   constructor(
     private answerRepository: AnswerRepository,
     private sendNotification: SendNotificationUseCase,
@@ -15,13 +15,13 @@ export class QuestionBestAnswerSettedListener implements EventHandler {
   setupSubscriptions(): void {
     DomainEvents.register(
       this.handle.bind(this),
-      SetQuestionBestAnswerEvent.name,
+      QuestionBestAnswerDefinedEvent.name,
     );
   }
 
   private async handle({
     bestAnswerId,
-  }: SetQuestionBestAnswerEvent): Promise<void> {
+  }: QuestionBestAnswerDefinedEvent): Promise<void> {
     const answer = await this.answerRepository.findById(
       bestAnswerId.toString(),
     );

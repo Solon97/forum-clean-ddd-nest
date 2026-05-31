@@ -2,7 +2,7 @@ import { UniqueEntityId } from '@/shared/entities/value-objects/unique-entity-id
 import { DomainEvent } from '@/shared/events/domain-event';
 import { Question } from '../question';
 
-export class SetQuestionBestAnswerEvent implements DomainEvent {
+export class QuestionBestAnswerDefinedEvent implements DomainEvent {
   readonly occurredAt: Date;
   readonly question: Question;
   readonly bestAnswerId: UniqueEntityId;

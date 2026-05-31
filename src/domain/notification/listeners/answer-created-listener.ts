@@ -1,4 +1,4 @@
-import { AnswerCreatedEvent } from '@/domain/forum/entities/events/answer-created-event';
+import { AnswerCreatedEvent } from '@/domain/forum/entities/events/answer-created';
 import { QuestionRepository } from '@/domain/forum/repositories/question-repository';
 import { DomainEvents } from '@/shared/events/domain-events';
 import { EventHandler } from '@/shared/events/event-handler';

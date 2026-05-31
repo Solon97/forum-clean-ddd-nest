@@ -136,7 +136,7 @@ Unit tests run against in-memory repositories — no DB or Docker required. E2E 
 
 - **Aggregate Roots** — `Question`, `Answer` extend `AggregateRoot` and manage domain events internally
 - **Value Objects** — `Slug`, `UniqueEntityId` constructed via static factory methods with validation
-- **Domain Events** — `AnswerCreatedEvent`, `SetQuestionBestAnswerEvent` trigger cross-aggregate side effects
+- **Domain Events** — `AnswerCreatedEvent`, `QuestionBestAnswerDefinedEvent` trigger cross-aggregate side effects
 - **Either Monad** — All use-cases return `Promise<Either<Error, Output>>` — no exceptions in domain layer
 - **Repository Pattern** — Domain interfaces; Prisma and in-memory implementations injected at runtime
 - **Watched Lists** — `QuestionAttachmentList`, `AnswerAttachmentList` track attachment changes for partial updates
