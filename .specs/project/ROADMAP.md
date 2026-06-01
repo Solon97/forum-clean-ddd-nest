@@ -11,6 +11,7 @@
 - Brownfield map the existing codebase into architecture, conventions, testing, and integration notes
 - Capture the main domain concepts and their boundaries in feature specs
 - Identify the smallest missing product gaps worth turning into feature work
+- Specify and implement reliable email notification delivery with RabbitMQ (outbox, retry, DLQ, idempotency, strategy-based event handlers)
 
 ## Later
 

@@ -12,17 +12,19 @@
 
 ## Todos
 
-- Brownfield map the codebase
-- Capture the first feature specification for the next area of change
-- Record any architectural concerns that emerge during deeper inspection
+- Define scope and design for deferred DLQ replay tooling feature
 
 ## Progress
 
 - Brownfield codebase mapping completed in `.specs/codebase/`
+- Feature specification created: `.specs/features/notification-email-reliability/spec.md`
+- Feature context decisions finalized: `.specs/features/notification-email-reliability/context.md`
+- Feature task breakdown created: `.specs/features/notification-email-reliability/tasks.md`
 
 ## Notes
 
 - Notification listeners and messaging infrastructure exist, but the root application module does not bootstrap the notification subdomain yet.
+- Current Prisma schema does not yet expose outbox/idempotency models, so schema alignment is required before implementation.
 
 ## Deferred Ideas
 
