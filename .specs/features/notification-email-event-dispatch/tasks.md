@@ -82,7 +82,7 @@ Atomic implementation plan for strategy-based notification dispatch with initial
 
 ### T4 - Build strategy registry and dispatcher use-case
 
-- Status: `TODO`
+- Status: `DONE`
 - What:
   - Implement dispatcher/orchestrator that:
     - receives a domain event
@@ -112,7 +112,7 @@ Atomic implementation plan for strategy-based notification dispatch with initial
 
 ### T5 - [P] Add infra email gateway implementation
 
-- Status: `TODO`
+- Status: `DONE`
 - What:
   - Implement domain email gateway in infra layer.
   - Initial implementation can be provider-backed or placeholder adapter (as project policy allows), but must respect domain contract.
