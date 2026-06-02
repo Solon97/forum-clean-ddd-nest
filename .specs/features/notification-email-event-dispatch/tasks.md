@@ -14,7 +14,7 @@ Atomic implementation plan for strategy-based notification dispatch with initial
 
 ### T1 - Define notification dispatch contracts
 
-- Status: `TODO`
+- Status: `DONE`
 - What:
   - Introduce contracts for strategy-based event dispatch and email delivery gateway.
   - Define a neutral notification intent model used between strategy and email sender.
@@ -35,7 +35,7 @@ Atomic implementation plan for strategy-based notification dispatch with initial
 
 ### T2 - Implement `AnswerCreatedEvent` strategy
 
-- Status: `TODO`
+- Status: `DONE`
 - What:
   - Create a strategy that handles `AnswerCreatedEvent`.
   - Resolve question author as recipient and generate subject/body content.
@@ -59,7 +59,7 @@ Atomic implementation plan for strategy-based notification dispatch with initial
 
 ### T3 - Implement `QuestionBestAnswerDefinedEvent` strategy
 
-- Status: `TODO`
+- Status: `DONE`
 - What:
   - Create a strategy that handles `QuestionBestAnswerDefinedEvent`.
   - Resolve answer author as recipient and generate subject/body content.
