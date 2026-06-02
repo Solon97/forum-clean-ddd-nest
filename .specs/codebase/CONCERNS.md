@@ -5,9 +5,6 @@
 - `AppModule` currently wires auth, database, questions, answers, attachments, and env config.
 - The notification subdomain exists, but it is not imported into the root module.
 
-## Messaging Maturity
-
-- The `src/infra/messaging/` tree suggests outbox and RabbitMQ support, but the main application bootstrap does not currently depend on it.
 
 ## Operational Dependencies
 

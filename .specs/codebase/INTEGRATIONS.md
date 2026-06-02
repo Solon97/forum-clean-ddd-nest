@@ -23,4 +23,3 @@
 
 - Domain events are emitted by aggregates and dispatched after repository persistence.
 - Notification listeners react to `AnswerCreatedEvent` and `QuestionBestAnswerDefinedEvent`.
-- The `src/infra/messaging/` tree exists for outbox, notification, and RabbitMQ work, but it is not part of the main app module bootstrap yet.
