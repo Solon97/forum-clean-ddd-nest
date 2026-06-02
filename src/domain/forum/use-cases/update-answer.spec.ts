@@ -29,7 +29,10 @@ describe('Update Answer', () => {
     inMemoryAnswerRepository = new InMemoryAnswerRepository();
     inMemoryAnswerAttachmentsRepository =
       new InMemoryAnswerAttachmentsRepository();
-    inMemoryAttachmentRepository = new InMemoryAttachmentRepository();
+    inMemoryAttachmentRepository = new InMemoryAttachmentRepository(
+      undefined,
+      inMemoryAnswerAttachmentsRepository,
+    );
     sut = new UpdateAnswerUseCase(
       inMemoryAnswerRepository,
       inMemoryAnswerAttachmentsRepository,
@@ -203,13 +206,15 @@ describe('Update Answer', () => {
     const linkedAttachmentId = UniqueEntityId.create();
     await inMemoryAttachmentRepository.create(
       new Attachment(
-        {
-          title: 'linked',
-          url: 'https://example.com/linked.png',
-          answerId: UniqueEntityId.create(),
-        },
+        { title: 'linked', url: 'https://example.com/linked.png' },
         linkedAttachmentId,
       ),
+    );
+    inMemoryAnswerAttachmentsRepository.items.push(
+      new AnswerAttachment({
+        answerId: UniqueEntityId.create(),
+        attachmentId: linkedAttachmentId,
+      }),
     );
 
     const result = await sut.execute({

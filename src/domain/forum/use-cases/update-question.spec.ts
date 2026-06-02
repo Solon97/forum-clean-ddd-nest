@@ -29,7 +29,9 @@ describe('Update Question', () => {
     inMemoryQuestionRepository = new InMemoryQuestionRepository();
     inMemoryQuestionAttachmentsRepository =
       new InMemoryQuestionAttachmentsRepository();
-    inMemoryAttachmentRepository = new InMemoryAttachmentRepository();
+    inMemoryAttachmentRepository = new InMemoryAttachmentRepository(
+      inMemoryQuestionAttachmentsRepository,
+    );
     sut = new UpdateQuestionUseCase(
       inMemoryQuestionRepository,
       inMemoryQuestionAttachmentsRepository,
@@ -209,13 +211,15 @@ describe('Update Question', () => {
     const linkedAttachmentId = UniqueEntityId.create();
     await inMemoryAttachmentRepository.create(
       new Attachment(
-        {
-          title: 'linked',
-          url: 'https://example.com/linked.png',
-          questionId: UniqueEntityId.create(),
-        },
+        { title: 'linked', url: 'https://example.com/linked.png' },
         linkedAttachmentId,
       ),
+    );
+    inMemoryQuestionAttachmentsRepository.items.push(
+      new QuestionAttachment({
+        questionId: UniqueEntityId.create(),
+        attachmentId: linkedAttachmentId,
+      }),
     );
 
     const result = await sut.execute({

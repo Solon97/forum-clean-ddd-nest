@@ -6,9 +6,16 @@ import {
   AttachmentAvailabilityStatus,
   AttachmentRepository,
 } from '@/domain/forum/repositories/attachment-repository';
+import { QuestionAttachmentsRepository } from '@/domain/forum/repositories/question-attachments-repository';
+import { AnswerAttachmentsRepository } from '@/domain/forum/repositories/answer-attachments-repository';
 
 export class InMemoryAttachmentRepository implements AttachmentRepository {
   public items: Attachment<AttachmentProps>[] = [];
+
+  constructor(
+    private questionAttachmentsRepository?: QuestionAttachmentsRepository,
+    private answerAttachmentsRepository?: AnswerAttachmentsRepository,
+  ) {}
 
   create(attachment: Attachment<AttachmentProps>): Promise<void> {
     this.items.push(attachment);
@@ -27,11 +34,24 @@ export class InMemoryAttachmentRepository implements AttachmentRepository {
     return Promise.resolve(
       this.items
         .filter((item) => attachmentIdsSet.has(item.id.toString()))
-        .map((item) => ({
-          id: item.id.toString(),
-          questionId: item.questionId?.toString() ?? null,
-          answerId: item.answerId?.toString() ?? null,
-        })),
+        .map((item) => {
+          const attachmentIdStr = item.id.toString();
+
+          const questionAttachment =
+            this.questionAttachmentsRepository?.items.find(
+              (qa) => qa.attachmentId.toString() === attachmentIdStr,
+            );
+
+          const answerAttachment = this.answerAttachmentsRepository?.items.find(
+            (aa) => aa.attachmentId.toString() === attachmentIdStr,
+          );
+
+          return {
+            id: attachmentIdStr,
+            questionId: questionAttachment?.questionId.toString() ?? null,
+            answerId: answerAttachment?.answerId.toString() ?? null,
+          };
+        }),
     );
   }
 }

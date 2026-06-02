@@ -6,10 +6,13 @@ import {
 } from '@test/helpers/assert-either';
 import { assertSpyCalled } from '@test/helpers/spy-helpers';
 import { InMemoryAttachmentRepository } from '@test/repositories/in-memory-attachment-repository';
+import { InMemoryAnswerAttachmentsRepository } from '@test/repositories/in-memory-answer-attachment-repository';
 import { InMemoryAnswerRepository } from '@test/repositories/in-memory-answer-repository';
 import { Mock } from 'vitest';
 import { Attachment } from '../entities/attachment';
+import { AnswerAttachment } from '../entities/answer-attachment';
 import type { AttachmentRepository } from '../repositories/attachment-repository';
+import type { AnswerAttachmentsRepository } from '../repositories/answer-attachments-repository';
 import { NotAllowedError } from '@/shared/errors/not-allowed';
 import {
   AnswerQuestionUseCase,
@@ -17,6 +20,7 @@ import {
 } from './answer-question';
 
 let inMemoryAnswerRepository: AnswerRepository;
+let inMemoryAnswerAttachmentsRepository: AnswerAttachmentsRepository;
 let inMemoryAttachmentRepository: AttachmentRepository;
 let answerQuestionUseCase: AnswerQuestionUseCase;
 let sutRepositorySpy: Mock<typeof inMemoryAnswerRepository.create>;
@@ -24,7 +28,12 @@ let sutRepositorySpy: Mock<typeof inMemoryAnswerRepository.create>;
 describe('Create Answer', () => {
   beforeEach(() => {
     inMemoryAnswerRepository = new InMemoryAnswerRepository();
-    inMemoryAttachmentRepository = new InMemoryAttachmentRepository();
+    inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository();
+    inMemoryAttachmentRepository = new InMemoryAttachmentRepository(
+      undefined,
+      inMemoryAnswerAttachmentsRepository,
+    );
     answerQuestionUseCase = new AnswerQuestionUseCase(
       inMemoryAnswerRepository,
       inMemoryAttachmentRepository,
@@ -124,13 +133,15 @@ describe('Create Answer', () => {
     const linkedAttachmentId = UniqueEntityId.create();
     await inMemoryAttachmentRepository.create(
       new Attachment(
-        {
-          title: 'linked',
-          url: 'https://example.com/linked.png',
-          answerId: UniqueEntityId.create(),
-        },
+        { title: 'linked', url: 'https://example.com/linked.png' },
         linkedAttachmentId,
       ),
+    );
+    inMemoryAnswerAttachmentsRepository.items.push(
+      new AnswerAttachment({
+        answerId: UniqueEntityId.create(),
+        attachmentId: linkedAttachmentId,
+      }),
     );
 
     const result = await answerQuestionUseCase.execute({
