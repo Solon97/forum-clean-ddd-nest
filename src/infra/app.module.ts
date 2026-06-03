@@ -5,6 +5,7 @@ import { DatabaseModule } from './database/database.module';
 import { EnvConfigModule } from './env/env.module';
 import { QuestionModule } from './resources/question/question.module';
 import { AttachmentModule } from './resources/attachment/attachment.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AttachmentModule } from './resources/attachment/attachment.module';
     QuestionModule,
     AnswerModule,
     AttachmentModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}

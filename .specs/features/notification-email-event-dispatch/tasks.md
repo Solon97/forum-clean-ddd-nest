@@ -132,7 +132,7 @@ Atomic implementation plan for strategy-based notification dispatch with initial
 
 ### T6 - Wire dispatcher in domain listeners
 
-- Status: `TODO`
+- Status: `DONE`
 - What:
   - Refactor current listeners to delegate to the new dispatcher use-case instead of embedding notification composition logic.
   - Keep listeners thin and event-focused.
@@ -153,7 +153,7 @@ Atomic implementation plan for strategy-based notification dispatch with initial
 
 ### T7 - Wire module bootstrap in infra app
 
-- Status: `TODO`
+- Status: `DONE`
 - What:
   - Ensure notification listeners/dispatcher/email adapter are instantiated in Nest module graph.
   - Import notification module in root app module if needed.
@@ -175,7 +175,7 @@ Atomic implementation plan for strategy-based notification dispatch with initial
 
 ### T8 - [P] Regression and behavior tests across event pipeline
 
-- Status: `TODO`
+- Status: `DONE`
 - What:
   - Add/adjust tests to guarantee:
     - `AnswerCreatedEvent` triggers email dispatch intent.
@@ -199,7 +199,7 @@ Atomic implementation plan for strategy-based notification dispatch with initial
 
 ### T9 - Final quality gate and cleanup
 
-- Status: `TODO`
+- Status: `DONE`
 - What:
   - Run full checks and remove dead code from old listener composition paths.
   - Ensure naming and boundaries remain aligned with Clean DDD conventions.
