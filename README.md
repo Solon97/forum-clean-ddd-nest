@@ -141,6 +141,30 @@ Unit tests run against in-memory repositories — no DB or Docker required. E2E 
 - **Repository Pattern** — Domain interfaces; Prisma and in-memory implementations injected at runtime
 - **Watched Lists** — `QuestionAttachmentList`, `AnswerAttachmentList` track attachment changes for partial updates
 
+## Notification System
+
+Domain events trigger email notifications through a strategy-based dispatch pipeline:
+
+```
+Domain event
+  → DomainEvents bus (registered on module init)
+    → DispatchNotificationUseCase
+      → NotificationStrategyRegistry (resolves strategy by event type)
+        → NotificationEventStrategy (fetches data, builds email intent)
+      → EmailGateway (sends notification)
+```
+
+**Supported events:**
+
+| Event | Recipient | Description |
+|---|---|---|
+| `AnswerCreatedEvent` | Question author | Notified when someone answers their question |
+| `QuestionBestAnswerDefinedEvent` | Answer author | Notified when their answer is marked as best |
+
+**Extensibility:** adding a new notification requires only implementing `NotificationEventStrategy` and registering it in `NotificationModule` — no changes to existing strategies or the dispatcher.
+
+The current `EmailGateway` implementation (`ConsoleEmailGateway`) logs to stdout. Swap it for a real provider by implementing the domain `EmailGateway` interface and rebinding it in `NotificationModule`.
+
 ## Project Structure (detailed)
 
 See [AGENTS.md](AGENTS.md) for a full breakdown of key files, patterns, and conventions useful when working on this codebase.
